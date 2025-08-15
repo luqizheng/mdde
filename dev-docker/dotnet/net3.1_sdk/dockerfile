@@ -1,12 +1,4 @@
 FROM mcr.microsoft.com/dotnet/sdk:3.1
-RUN sed -i 's#http://deb.debian.org#https://mirrors.tuna.tsinghua.edu.cn/debian#g' /etc/apt/sources.list
-# 安装系统工具
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    vim \
-    nano \
-    && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
 WORKDIR /workspace
