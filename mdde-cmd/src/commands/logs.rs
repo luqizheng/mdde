@@ -5,13 +5,15 @@ use std::process::Command;
 use tracing::info;
 
 pub async fn execute(
-    name: String,
     follow: bool,
     tail: Option<usize>,
     since: Option<String>,
     _config: Config,
 ) -> Result<(), MddeError> {
-    info!("查看开发环境日志: {}", name);
+
+    let name =_config.container_name.clone();
+
+    info!("查看开发环境日志: {}", name.clone().unwrap_or_default());
 
     // 检查 docker-compose.yml 文件是否存在
     let compose_file = std::env::current_dir()?.join("docker-compose.yml");

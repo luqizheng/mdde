@@ -13,7 +13,7 @@ pub async fn execute(
     workspace: Option<String>,
     mut config: Config,
 ) -> Result<(), MddeError> {
-    info!("创建开发环境: {} ({})", name, dev_env);
+    info!("创建开发环境: {} ({})", name.clone(), dev_env);
 
     // 确定工作目录
     let workspace_path = workspace

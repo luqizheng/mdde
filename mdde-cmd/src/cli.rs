@@ -41,9 +41,6 @@ pub enum Commands {
 
     /// 启动指定的开发环境
     Start {
-        /// 环境名称
-        name: String,
-        
         /// 后台运行
         #[arg(short, long)]
         detach: bool,
@@ -51,19 +48,14 @@ pub enum Commands {
 
     /// 停止指定的开发环境
     Stop {
-        /// 环境名称
-        name: String,
-        
+     
         /// 停止后删除容器
         #[arg(long)]
         remove: bool,
     },
 
     /// 重启指定的开发环境
-    Restart {
-        /// 环境名称
-        name: String,
-    },
+    Restart ,
 
     /// 查看所有开发环境的状态
     Status {
@@ -74,9 +66,7 @@ pub enum Commands {
 
     /// 查看指定环境的日志
     Logs {
-        /// 环境名称
-        name: String,
-        
+ 
         /// 实时跟踪日志
         #[arg(short, long)]
         follow: bool,
@@ -130,12 +120,12 @@ impl Cli {
             Commands::Create { dev_env, name, debug_port, workspace } => {
                 create::execute(dev_env, name, debug_port, workspace, config).await
             }
-            Commands::Start { name, detach } => start::execute(name, detach, config).await,
-            Commands::Stop { name, remove } => stop::execute(name, remove, config).await,
-            Commands::Restart { name } => restart::execute(name, config).await,
+            Commands::Start { detach } => start::execute(detach, config).await,
+            Commands::Stop {  remove } => stop::execute( remove, config).await,
+            Commands::Restart => restart::execute(config).await,
             Commands::Status { format } => status::execute(format, config).await,
-            Commands::Logs { name, follow, tail, since } => {
-                logs::execute(name, follow, tail, since, config).await
+            Commands::Logs {  follow, tail, since } => {
+                logs::execute( follow, tail, since, config).await
             }
             Commands::Clean { all, images, containers, volumes } => {
                 clean::execute(all, images, containers, volumes, config).await

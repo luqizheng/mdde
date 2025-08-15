@@ -1,10 +1,10 @@
 version: '3.8'
 services:
   dotnet-dev:
-    build: .
+    image: zhcoder-docker-registry.com:8000/dev-env/dotnet9:1.0.0
     container_name: ${CONTAINER_NAME:-dotnet-dev}
     volumes:
-      - ${SOURCE_CODE_PATH}:/workspace
+      - ${workspace}:/workspace
       - nuget-packages:/home/developer/.nuget/packages
     working_dir: /workspace
     ports:

@@ -4,8 +4,10 @@ use colored::*;
 use std::process::Command;
 use tracing::info;
 
-pub async fn execute(name: String, remove: bool, _config: Config) -> Result<(), MddeError> {
-    info!("停止开发环境: {}", name);
+pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
+    let name =_config.container_name.clone().unwrap_or("default".to_string());
+
+    info!("停止开发环境: {}", name.clone());
 
     // 检查 docker-compose.yml 文件是否存在
     let compose_file = std::env::current_dir()?.join("docker-compose.yml");

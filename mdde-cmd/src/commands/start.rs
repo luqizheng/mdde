@@ -4,8 +4,10 @@ use colored::*;
 use std::process::Command;
 use tracing::info;
 
-pub async fn execute(name: String, detach: bool, _config: Config) -> Result<(), MddeError> {
-    info!("启动开发环境: {}", name);
+pub async fn execute(detach: bool, _config: Config) -> Result<(), MddeError> {
+    let name =_config.container_name.clone();
+
+    info!("启动开发环境: {}", name.clone().unwrap_or_default());
 
     // 检查 docker-compose.yml 文件是否存在
     let compose_file = std::env::current_dir()?.join("docker-compose.yml");
@@ -39,7 +41,7 @@ pub async fn execute(name: String, detach: bool, _config: Config) -> Result<(), 
         println!("{}", "✓ 开发环境启动成功".green());
         if detach {
             println!("环境已在后台运行");
-            println!("查看日志: mdde logs {}", name);
+            println!("查看日志: mdde logs");
             println!("查看状态: mdde status");
         }
     } else {
