@@ -35,6 +35,12 @@ pub enum MddeError {
     #[error("无效的参数: {0}")]
     InvalidArgument(String),
 
+    #[error("无效的输入: {0}")]
+    InvalidInput(String),
+
+    #[error("容器未运行: {0}")]
+    ContainerNotRunning(String),
+
     #[error("网络错误: {0}")]
     Network(String),
 
@@ -54,5 +60,11 @@ impl From<String> for MddeError {
 impl From<&str> for MddeError {
     fn from(err: &str) -> Self {
         MddeError::Unknown(err.to_string())
+    }
+}
+
+impl From<crate::docker::DockerError> for MddeError {
+    fn from(err: crate::docker::DockerError) -> Self {
+        MddeError::Docker(err.to_string())
     }
 }

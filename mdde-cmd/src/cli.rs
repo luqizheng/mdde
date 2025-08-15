@@ -1,4 +1,4 @@
-use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version};
+use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run};
 use crate::config::Config;
 use crate::error::MddeError;
 use clap::{Parser, Subcommand};
@@ -17,7 +17,7 @@ pub enum Commands {
     /// 初始化 mdde 相关配置
     Init {
         /// mdde 服务器地址
-        #[arg(short, long, default_value = "http://192.168.2.5:3000")]
+        #[arg(long, default_value = "http://192.168.2.5:3000")]
         host: String,
     },
 
@@ -56,6 +56,13 @@ pub enum Commands {
 
     /// 重启指定的开发环境
     Restart ,
+
+    /// 在容器中执行命令
+    Run {
+        /// 要执行的命令
+        #[arg(required = true)]
+        command: Vec<String>,
+    },
 
     /// 查看所有开发环境的状态
     Status {
@@ -123,6 +130,7 @@ impl Cli {
             Commands::Start { detach } => start::execute(detach, config).await,
             Commands::Stop {  remove } => stop::execute( remove, config).await,
             Commands::Restart => restart::execute(config).await,
+            Commands::Run { command } => run::execute(command, config).await,
             Commands::Status { format } => status::execute(format, config).await,
             Commands::Logs {  follow, tail, since } => {
                 logs::execute( follow, tail, since, config).await

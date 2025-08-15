@@ -8,3 +8,4 @@ pub mod logs;
 pub mod clean;
 pub mod doctor;
 pub mod version;
+pub mod run;

@@ -60,9 +60,9 @@ pub async fn execute(
     println!("环境变量文件: .mdde.env");
 
     println!("\n{}", "下一步操作:".yellow());
-    println!("1. 启动环境: mdde start {}", name);
+    println!("1. 启动环境: mdde start");
     println!("2. 查看状态: mdde status");
-    println!("3. 查看日志: mdde logs {}", name);
+    println!("3. 查看日志: mdde logs");
 
     Ok(())
 }
