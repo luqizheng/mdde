@@ -1,0 +1,60 @@
+[package]
+name = "mdde"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "一个基于 Rust 编写的跨平台命令行工具，用于管理 Docker 多语言开发环境"
+license = "MIT"
+repository = "https://github.com/your-username/mdde-cmd"
+keywords = ["docker", "development", "environment", "cli", "dotnet", "java", "nodejs", "python"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+# CLI 框架
+clap = { version = "4.4", features = ["derive"] }
+
+# 异步运行时
+tokio = { version = "1.35", features = ["full"] }
+
+# HTTP 客户端
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# 错误处理
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# 文件系统
+dirs = "5.0"
+walkdir = "2.4"
+
+# 网络
+url = "2.4"
+
+# 其他工具
+chrono = { version = "0.4", features = ["serde"] }
+colored = "2.0"
+indicatif = "0.17"
+tempfile = "3.8"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[bin]]
+name = "mdde"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

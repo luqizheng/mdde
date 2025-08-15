@@ -1,0 +1,39 @@
+# Rust 构建产物
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 环境变量文件
+.env
+.env.local
+
+# 配置文件（可选，根据需要调整）
+# config.toml
+
+# 测试覆盖率报告
+coverage/
+*.profraw
+
+# 依赖锁定文件（对于库项目）
+# Cargo.lock
+
+
