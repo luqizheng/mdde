@@ -80,18 +80,20 @@ pub enum Commands {
 
     /// 查看指定环境的日志
     Logs {
- 
+        /// 显示最后 N 行 (位置参数，可直接写数字，如: mdde logs 50)
+        lines: Option<usize>,
+        
+        /// 显示最后 N 行
+        #[arg(short = 'l', long)]
+        tail: Option<usize>,
+        
+        /// 显示所有日志
+        #[arg(short = 'a', long)]
+        all: bool,
+        
         /// 实时跟踪日志
         #[arg(short, long)]
         follow: bool,
-        
-        /// 显示最后 N 行
-        #[arg(long)]
-        tail: Option<usize>,
-        
-        /// 显示指定时间后的日志
-        #[arg(long)]
-        since: Option<String>,
     },
 
     /// 清理未使用的 Docker 资源
@@ -122,15 +124,15 @@ pub enum Commands {
     /// 管理环境变量配置文件
     Env {
         /// 设置环境变量 (格式: key=value)
-        #[arg(long)]
+        #[arg(long,short)]
         set: Option<String>,
         
         /// 显示所有环境变量
-        #[arg(long)]
+        #[arg(long,short)]
         ls: bool,
         
         /// 删除环境变量
-        #[arg(long)]
+        #[arg(long,short)]
         del: Option<String>,
     },
 }
@@ -155,8 +157,8 @@ impl Cli {
             Commands::Run { command } => run::execute(command, config).await,
             Commands::Exec { shell } => exec::execute(shell, config).await,
             Commands::Status { format } => status::execute(format, config).await,
-            Commands::Logs {  follow, tail, since } => {
-                logs::execute( follow, tail, since, config).await
+            Commands::Logs { lines, tail, all, follow } => {
+                logs::execute(lines, tail, all, follow, config).await
             }
             Commands::Clean { all, images, containers, volumes } => {
                 clean::execute(all, images, containers, volumes, config).await

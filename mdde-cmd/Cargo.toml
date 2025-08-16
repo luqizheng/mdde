@@ -2,10 +2,10 @@
 name = "mdde"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["luqizheng <luqizheng@hotmail,com>"]
 description = "一个基于 Rust 编写的跨平台命令行工具，用于管理 Docker 多语言开发环境"
 license = "MIT"
-repository = "https://github.com/your-username/mdde-cmd"
+repository = "https://github.com/luqizheng/mdde"
 keywords = ["docker", "development", "environment", "cli", "dotnet", "java", "nodejs", "python"]
 categories = ["command-line-utilities", "development-tools"]
 
