@@ -1,4 +1,4 @@
-use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run};
+use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run, exec};
 use crate::config::Config;
 use crate::error::MddeError;
 use clap::{Parser, Subcommand};
@@ -62,6 +62,13 @@ pub enum Commands {
         /// 要执行的命令
         #[arg(required = true)]
         command: Vec<String>,
+    },
+
+    /// 进入容器进行交互式操作 (相当于 docker exec -it /bin/bash)
+    Exec {
+        /// 要执行的命令，默认为 /bin/bash
+        #[arg(default_value = "/bin/bash")]
+        shell: String,
     },
 
     /// 查看所有开发环境的状态
@@ -131,6 +138,7 @@ impl Cli {
             Commands::Stop {  remove } => stop::execute( remove, config).await,
             Commands::Restart => restart::execute(config).await,
             Commands::Run { command } => run::execute(command, config).await,
+            Commands::Exec { shell } => exec::execute(shell, config).await,
             Commands::Status { format } => status::execute(format, config).await,
             Commands::Logs {  follow, tail, since } => {
                 logs::execute( follow, tail, since, config).await

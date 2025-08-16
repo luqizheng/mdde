@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # MDDE Web Docker 构建脚本
 
