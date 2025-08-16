@@ -20,8 +20,7 @@ pub async fn execute(host: String, mut config: Config) -> Result<(), MddeError> 
 
     println!("{}", "✓ mdde 配置初始化成功".green());
     println!("服务器地址: {}", host);
-    println!("配置文件已保存到: {}", Config::get_config_path()?.display());
-    println!("环境变量文件已创建: .mdde.env");
+    println!("环境变量文件已创建: .mdde/cfg.env");
 
     Ok(())
 }
