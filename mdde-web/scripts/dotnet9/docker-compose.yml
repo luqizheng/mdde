@@ -8,8 +8,7 @@ services:
       - nuget-packages:/home/developer/.nuget/packages
     working_dir: /workspace
     ports:
-      - "${APP_PORT:-5001}:5001"
-      - "5002:5002"
+      - "${APP_PORT:-5001:5660}"
     environment:
       - ASPNETCORE_URLS=http://+:5001
       - ASPNETCORE_ENVIRONMENT=Development

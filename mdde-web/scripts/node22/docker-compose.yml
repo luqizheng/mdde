@@ -8,7 +8,7 @@ services:
       - nuget-packages:/home/developer/.nuget/packages
     working_dir: /workspace
     ports:
-      - "${APP_PORT:-5001}:5660"
+      - "${APP_PORT:-5001:5660}"
     command: tail -f /dev/null
     networks:
       - dev-network

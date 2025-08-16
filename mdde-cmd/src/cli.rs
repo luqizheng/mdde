@@ -30,9 +30,9 @@ pub enum Commands {
         #[arg(short, long)]
         name: String,
         
-        /// 调试端口
+        /// 调试端口 (格式: host_port:container_port)
         #[arg(long)]
-        debug_port: Option<u16>,
+        debug_port: Option<String>,
         
         /// 工作目录路径
         #[arg(short, long)]
