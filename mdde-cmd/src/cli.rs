@@ -16,19 +16,19 @@ pub struct Cli {
 pub enum Commands {
     /// 初始化 mdde 相关配置
     Init {
-        /// mdde 服务器地址
-        #[arg(long, default_value = "http://192.168.2.5:3000")]
-        host: String,
+        /// mdde 服务器地址 (可选，未指定时将交互式询问)
+        #[arg(long)]
+        host: Option<String>,
     },
 
     /// 创建新的开发环境
     Create {
-        /// 开发环境类型 (如: dotnet9, java18, java19_tomcat)
-        dev_env: String,
+        /// 开发环境类型 (如: dotnet9, java18, java19_tomcat) [可选，未指定时将交互式询问]
+        dev_env: Option<String>,
         
-        /// 环境名称
+        /// 环境名称 [可选，未指定时将交互式询问]
         #[arg(short, long)]
-        name: String,
+        name: Option<String>,
         
         /// 调试端口 (格式: host_port:container_port)
         #[arg(long)]

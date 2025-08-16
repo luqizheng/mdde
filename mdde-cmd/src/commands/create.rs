@@ -3,6 +3,7 @@ use crate::error::MddeError;
 use crate::http::MddeClient;
 use colored::*;
 use std::collections::HashMap;
+use std::io::{self, Write};
 use std::path::PathBuf;
 use tracing::info;
 
@@ -41,12 +42,36 @@ fn validate_debug_port(port_mapping: &str) -> Result<(u16, u16), MddeError> {
 }
 
 pub async fn execute(
-    dev_env: String,
-    name: String,
+    dev_env: Option<String>,
+    name: Option<String>,
     debug_port: Option<String>,
     workspace: Option<String>,
     mut config: Config,
 ) -> Result<(), MddeError> {
+    // 获取开发环境类型，如果没有提供则交互式询问
+    let dev_env = match dev_env {
+        Some(env) => {
+            if env.trim().is_empty() {
+                get_dev_env_interactively()?
+            } else {
+                env
+            }
+        }
+        None => get_dev_env_interactively()?,
+    };
+
+    // 获取环境名称，如果没有提供则交互式询问
+    let name = match name {
+        Some(n) => {
+            if n.trim().is_empty() {
+                get_name_interactively()?
+            } else {
+                n
+            }
+        }
+        None => get_name_interactively()?,
+    };
+
     info!("创建开发环境: {} ({})", name.clone(), dev_env);
 
     // 验证调试端口格式
@@ -99,7 +124,7 @@ pub async fn execute(
         println!("调试端口: {} (主机端口:{} -> 容器端口:{})", port_str, host_port, container_port);
     }
     println!("配置文件: docker-compose.yml");
-    println!("环境变量文件: .mdde.env");
+    println!("环境变量文件: .mdde/cfg.env");
 
     println!("\n{}", "下一步操作:".yellow());
     println!("1. 启动环境: mdde start");
@@ -107,4 +132,74 @@ pub async fn execute(
     println!("3. 查看日志: mdde logs");
 
     Ok(())
+}
+
+/// 交互式获取开发环境类型
+fn get_dev_env_interactively() -> Result<String, MddeError> {
+    println!("{}", "请选择开发环境类型:".cyan());
+    println!("可用选项:");
+    println!("  - dotnet9      (.NET 9 开发环境)");
+    println!("  - dotnet8      (.NET 8 开发环境)");
+    println!("  - dotnet6      (.NET 6 开发环境)");
+    println!("  - java21       (Java 21 开发环境)");
+    println!("  - java18       (Java 18 开发环境)");
+    println!("  - java11       (Java 11 开发环境)");
+    println!("  - node22       (Node.js 22 开发环境)");
+    println!("  - node20       (Node.js 20 开发环境)");
+    println!("  - node18       (Node.js 18 开发环境)");
+    println!("  - python312    (Python 3.12 开发环境)");
+    println!("  - python311    (Python 3.11 开发环境)");
+    
+    print!("请输入开发环境类型: ");
+    io::stdout().flush().map_err(|e| MddeError::Io(e))?;
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).map_err(|e| MddeError::Io(e))?;
+    
+    let dev_env = input.trim();
+    
+    if dev_env.is_empty() {
+        return Err(MddeError::InvalidInput("开发环境类型不能为空".to_string()));
+    }
+
+    // 验证输入的环境类型是否有效
+    let valid_envs = [
+        "dotnet9", "dotnet8", "dotnet6",
+        "java21", "java18", "java11",
+        "node22", "node20", "node18",
+        "python312", "python311"
+    ];
+    
+    if !valid_envs.contains(&dev_env) {
+        return Err(MddeError::InvalidInput(format!(
+            "无效的开发环境类型: '{}'. 请选择有效的环境类型", dev_env
+        )));
+    }
+    
+    Ok(dev_env.to_string())
+}
+
+/// 交互式获取环境名称
+fn get_name_interactively() -> Result<String, MddeError> {
+    println!("{}", "请输入环境名称:".cyan());
+    print!("环境名称 (用于标识容器): ");
+    io::stdout().flush().map_err(|e| MddeError::Io(e))?;
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).map_err(|e| MddeError::Io(e))?;
+    
+    let name = input.trim();
+    
+    if name.is_empty() {
+        return Err(MddeError::InvalidInput("环境名称不能为空".to_string()));
+    }
+
+    // 验证名称格式（只允许字母数字和连字符）
+    if !name.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_') {
+        return Err(MddeError::InvalidInput(
+            "环境名称只能包含字母、数字、连字符和下划线".to_string()
+        ));
+    }
+    
+    Ok(name.to_string())
 }
