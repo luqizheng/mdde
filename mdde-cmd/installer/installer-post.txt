@@ -1,0 +1,27 @@
+MDDE 安装完成！
+
+后续步骤：
+1. 打开新的命令提示符或 PowerShell 窗口
+2. 运行 "mdde version" 验证安装是否成功
+3. 运行 "mdde doctor" 检查系统环境
+4. 运行 "mdde --help" 查看所有可用命令
+
+快速开始：
+• 初始化配置: mdde init http://localhost:3000
+• 创建开发环境: mdde create dotnet9 --name myproject
+• 启动环境: mdde start myproject
+• 查看状态: mdde status
+• 查看帮助: mdde --help
+
+重要提醒：
+• MDDE 需要与 Docker Desktop 配合使用
+• 确保 Docker Desktop 正在运行
+• 首次使用前请运行 "mdde doctor" 检查系统配置
+
+文档和支持：
+• 项目主页: https://github.com/your-username/mdde-cmd
+• 使用文档: 安装目录下的 README.md
+• 问题反馈: https://github.com/your-username/mdde-cmd/issues
+
+感谢您使用 MDDE！
+
