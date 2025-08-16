@@ -6,18 +6,18 @@ use tokio::fs;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
-    pub mdde_host: String,
+    pub host: String,
     pub container_name: Option<String>,
-    pub debug_port: Option<u16>,
+    pub app_port: Option<u16>,
     pub workspace: Option<PathBuf>,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            mdde_host: "http://192.168.2.5:3000".to_string(),
+            host: "http://192.168.2.5:3000".to_string(),
             container_name: None,
-            debug_port: None,
+            app_port: None,
             workspace: None,
         }
     }
@@ -32,15 +32,15 @@ impl Config {
         let mut config = Config::default();
 
         // 从环境变量文件覆盖配置
-        if let Some(host) = env_vars.get("mdde_host") {
-            config.mdde_host = host.clone();
+        if let Some(host) = env_vars.get("host") {
+            config.host = host.clone();
         }
         if let Some(container_name) = env_vars.get("container_name") {
             config.container_name = Some(container_name.clone());
         }
-        if let Some(debug_port) = env_vars.get("debug_port") {
-            if let Ok(port) = debug_port.parse::<u16>() {
-                config.debug_port = Some(port);
+        if let Some(app_port) = env_vars.get("app_port") {
+            if let Ok(port) = app_port.parse::<u16>() {
+                config.app_port = Some(port);
             }
         }
         if let Some(workspace) = env_vars.get("workspace") {
@@ -55,12 +55,12 @@ impl Config {
         let mut env_vars = HashMap::new();
 
         // 将配置转换为环境变量格式
-        env_vars.insert("mdde_host".to_string(), self.mdde_host.clone());
+        env_vars.insert("host".to_string(), self.host.clone());
         if let Some(container_name) = &self.container_name {
             env_vars.insert("container_name".to_string(), container_name.clone());
         }
-        if let Some(debug_port) = self.debug_port {
-            env_vars.insert("debug_port".to_string(), debug_port.to_string());
+        if let Some(app_port) = self.app_port {
+            env_vars.insert("app_port".to_string(), app_port.to_string());
         }
         if let Some(workspace) = &self.workspace {
             env_vars.insert(
@@ -69,7 +69,7 @@ impl Config {
             );
         }
 
-        // 保存到 .mdde.env 文件
+        // 保存到 cfg.env 文件
         Self::save_env_file(&env_vars).await
     }
 
@@ -77,10 +77,10 @@ impl Config {
     pub async fn update(&mut self, updates: HashMap<String, String>) -> Result<(), MddeError> {
         for (key, value) in updates {
             match key.as_str() {
-                "mdde_host" => self.mdde_host = value,
+                "host" => self.host = value,
                 "container_name" => self.container_name = Some(value),
-                "debug_port" => {
-                    self.debug_port = Some(
+                "app_port" => {
+                    self.app_port = Some(
                         value
                             .parse()
                             .map_err(|_| MddeError::InvalidArgument("无效的端口号".to_string()))?,

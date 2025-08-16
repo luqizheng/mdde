@@ -39,3 +39,6 @@ coverage/
 
 
 
+
+# MDDE 配置目录
+.mdde/

@@ -1,4 +1,4 @@
-use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run, exec};
+use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run, exec, env};
 use crate::config::Config;
 use crate::error::MddeError;
 use clap::{Parser, Subcommand};
@@ -30,9 +30,9 @@ pub enum Commands {
         #[arg(short, long)]
         name: Option<String>,
         
-        /// 调试端口 (格式: host_port:container_port)
+        /// 应用端口 (格式: host_port:container_port)
         #[arg(long)]
-        debug_port: Option<String>,
+        app_port: Option<String>,
         
         /// 工作目录路径
         #[arg(short, long)]
@@ -118,6 +118,21 @@ pub enum Commands {
 
     /// 显示版本信息
     Version,
+
+    /// 管理环境变量配置文件
+    Env {
+        /// 设置环境变量 (格式: key=value)
+        #[arg(long)]
+        set: Option<String>,
+        
+        /// 显示所有环境变量
+        #[arg(long)]
+        ls: bool,
+        
+        /// 删除环境变量
+        #[arg(long)]
+        del: Option<String>,
+    },
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
@@ -131,8 +146,8 @@ impl Cli {
     pub async fn execute(self, config: Config) -> Result<(), MddeError> {
         match self.command {
             Commands::Init { host } => init::execute(host, config).await,
-            Commands::Create { dev_env, name, debug_port, workspace } => {
-                create::execute(dev_env, name, debug_port, workspace, config).await
+            Commands::Create { dev_env, name, app_port, workspace } => {
+                create::execute(dev_env, name, app_port, workspace, config).await
             }
             Commands::Start { detach } => start::execute(detach, config).await,
             Commands::Stop {  remove } => stop::execute( remove, config).await,
@@ -148,6 +163,9 @@ impl Cli {
             }
             Commands::Doctor => doctor::execute(config).await,
             Commands::Version => version::execute().await,
+            Commands::Env { set, ls, del } => {
+                env::execute(set, ls, del, config).await
+            }
         }
     }
 }

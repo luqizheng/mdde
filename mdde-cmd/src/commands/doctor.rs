@@ -85,22 +85,22 @@ async fn check_network_connection(config: &Config) -> Result<(), MddeError> {
     println!("{}", "\n🌐 检查网络连接...".cyan());
 
     let client = reqwest::Client::new();
-    let response = client.get(&config.mdde_host).send().await;
+    let response = client.get(&config.host).send().await;
 
     match response {
         Ok(response) if response.status().is_success() => {
             println!("{}", "✓ 网络连接正常".green());
-            println!("  服务器: {}", config.mdde_host);
+            println!("  服务器: {}", config.host);
         }
         Ok(response) => {
             println!("{}", "⚠ 服务器响应异常".yellow());
             println!("  状态码: {}", response.status());
-            println!("  服务器: {}", config.mdde_host);
+            println!("  服务器: {}", config.host);
         }
         Err(e) => {
             println!("{}", "✗ 网络连接失败".red());
             println!("  错误: {}", e);
-            println!("  服务器: {}", config.mdde_host);
+            println!("  服务器: {}", config.host);
         }
     }
 

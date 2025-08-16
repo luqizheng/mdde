@@ -25,12 +25,12 @@ pub async fn execute(host: Option<String>, mut config: Config) -> Result<(), Mdd
 
     // 更新配置
     let mut updates = HashMap::new();
-    updates.insert("mdde_host".to_string(), host.clone());
+    updates.insert("host".to_string(), host.clone());
     config.update(updates).await?;
 
     // 创建环境变量文件
     let mut env_vars = HashMap::new();
-    env_vars.insert("mdde_host".to_string(), host.clone());
+    env_vars.insert("host".to_string(), host.clone());
     
     Config::save_env_file(&env_vars).await?;
 

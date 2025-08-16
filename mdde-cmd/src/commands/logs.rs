@@ -22,14 +22,15 @@ pub async fn execute(
     }
 
     // 检查 .mdde.env 文件是否存在
-    let env_file = std::env::current_dir()?.join(".mdde.env");
+    let env_file = std::env::current_dir()?.join(".mdde").join("cfg.env");
     if !env_file.exists() {
-        return Err(MddeError::FileOperation(".mdde.env 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(".mdde/cfg.env 文件不存在".to_string()));
     }
 
     // 构建 docker-compose 命令
     let mut cmd = Command::new("docker-compose");
-    cmd.arg("--env-file").arg(".mdde.env");
+    cmd.arg("--env-file").arg(".mdde/cfg.env");
+    cmd.arg("--file").arg(".mdde/docker-compose.yml");
     cmd.arg("logs");
 
     if follow {
