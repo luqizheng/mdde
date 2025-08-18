@@ -1,6 +1,7 @@
 use crate::cli::OutputFormat;
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use serde_json::json;
 use std::process::Command;
@@ -38,7 +39,7 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
 
     match format {
         OutputFormat::Table => {
-            println!("{}", "开发环境状态:".yellow());
+            println!("{}", i18n::t("environment_status").yellow());
             println!("{}", status_output);
         }
         OutputFormat::Json => {

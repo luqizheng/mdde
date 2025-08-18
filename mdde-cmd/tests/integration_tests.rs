@@ -5,7 +5,7 @@ async fn test_config_default() {
     let config = Config::default();
     assert_eq!(config.host, "http://192.168.2.5:3000");
     assert!(config.container_name.is_none());
-    assert!(config.debug_port.is_none());
+    assert!(config.app_port.is_none());
     assert!(config.workspace.is_none());
 }
 

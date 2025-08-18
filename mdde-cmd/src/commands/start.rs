@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use std::process::Command;
 use tracing::info;
@@ -31,18 +32,18 @@ pub async fn execute(detach: bool, _config: Config) -> Result<(), MddeError> {
         cmd.arg("up");
     }
 
-    println!("{}", "启动开发环境...".yellow());
-    println!("命令: {}", format!("{:?}", cmd).cyan());
+    println!("{}", i18n::t("starting_environment").yellow());
+    println!("{}", i18n::tf("command", &[&format!("{:?}", cmd).cyan()]));
 
     // 执行命令
     let output = cmd.output()?;
 
     if output.status.success() {
-        println!("{}", "✓ 开发环境启动成功".green());
+        println!("{}", i18n::t("environment_started").green());
         if detach {
-            println!("环境已在后台运行");
-            println!("查看日志: mdde logs");
-            println!("查看状态: mdde status");
+            println!("{}", i18n::t("running_in_background"));
+            println!("{}", i18n::t("view_logs"));
+            println!("{}", i18n::t("view_status"));
         }
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);

@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use std::collections::HashMap;
 use std::io::{self, Write};
@@ -34,17 +35,17 @@ pub async fn execute(host: Option<String>, mut config: Config) -> Result<(), Mdd
     
     Config::save_env_file(&env_vars).await?;
 
-    println!("{}", "✓ mdde 配置初始化成功".green());
-    println!("服务器地址: {}", host);
-    println!("环境变量文件已创建: .mdde/cfg.env");
+    println!("{}", i18n::t("init_success").green());
+    println!("{}", i18n::tf("server_address", &[&host]));
+    println!("{}", i18n::t("env_file_created"));
 
     Ok(())
 }
 
 /// 交互式获取服务器地址
 fn get_host_interactively() -> Result<String, MddeError> {
-    println!("{}", "请输入 MDDE 服务器地址:".cyan());
-    print!("默认地址 [http://192.168.2.5:3000]: ");
+    println!("{}", i18n::t("enter_server_address").cyan());
+    print!("{}", i18n::t("default_address"));
     io::stdout().flush().map_err(|e| MddeError::Io(e))?;
 
     let mut input = String::new();

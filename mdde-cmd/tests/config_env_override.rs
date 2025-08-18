@@ -1,5 +1,4 @@
 use mdde::config::Config;
-use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use tempfile::tempdir;
@@ -91,7 +90,7 @@ async fn test_config_save_and_load() {
     let mut test_config = Config::default();
     test_config.host = "http://test-server:9000".to_string();
     test_config.container_name = Some("test-container".to_string());
-    test_config.debug_port = Some(5000);
+    test_config.app_port = Some(5000);
     test_config.workspace = Some(PathBuf::from("./test-workspace"));
     
     // 保存配置

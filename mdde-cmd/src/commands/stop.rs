@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use std::process::Command;
 use tracing::info;
@@ -32,16 +33,16 @@ pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
         cmd.arg("down");
     }
 
-    println!("{}", "停止开发环境...".yellow());
-    println!("命令: {}", format!("{:?}", cmd).cyan());
+    println!("{}", i18n::t("stopping_environment").yellow());
+    println!("{}", i18n::tf("command", &[&format!("{:?}", cmd).cyan()]));
 
     // 执行命令
     let output = cmd.output()?;
 
     if output.status.success() {
-        println!("{}", "✓ 开发环境已停止".green());
+        println!("{}", i18n::t("environment_stopped").green());
         if remove {
-            println!("容器和卷已删除");
+            println!("{}", i18n::t("containers_volumes_removed"));
         }
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);

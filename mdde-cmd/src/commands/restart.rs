@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use tracing::info;
 
@@ -8,7 +9,7 @@ pub async fn execute( config: Config) -> Result<(), MddeError> {
 
     info!("重启开发环境: {}", name.clone());
 
-    println!("{}", "重启开发环境...".yellow());
+    println!("{}", i18n::t("restarting_environment").yellow());
 
     // 先停止环境
     crate::commands::stop::execute(false, config.clone()).await?;
@@ -19,8 +20,8 @@ pub async fn execute( config: Config) -> Result<(), MddeError> {
     // 再启动环境
     crate::commands::start::execute(true, config).await?;
 
-    println!("{}", "✓ 开发环境重启成功".green());
-    println!("环境名称: {}", name);
+    println!("{}", i18n::t("restart_success").green());
+    println!("{}", i18n::tf("environment_name", &[&name]));
 
     Ok(())
 }
