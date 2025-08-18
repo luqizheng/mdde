@@ -3,7 +3,6 @@
 //! 这个示例展示了如何使用 MDDE 命令行工具的基本功能
 
 use mdde::{Config, http::MddeClient};
-use std::iter::repeat;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -13,11 +12,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 1. 初始化配置
     println!("\n1. 初始化配置...");
     let config = Config::default();
-    println!("默认服务器地址: {}", config.mdde_host);
+    println!("默认服务器地址: {}", config.host);
 
     // 2. 创建 HTTP 客户端
     println!("\n2. 创建 HTTP 客户端...");
-    let client = MddeClient::new(&config.mdde_host);
+    let client = MddeClient::new(&config.host);
     
     // 3. 测试连接
     println!("\n3. 测试服务器连接...");

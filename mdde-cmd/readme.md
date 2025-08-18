@@ -58,7 +58,7 @@
 cp .mdde.env.example .mdde.env
 
 # 编辑配置
-mdde_host=http://your-server:3000
+host=http://your-server:3000
 container_name=my-project
 debug_port=5000
 workspace=./my-workspace
@@ -68,7 +68,7 @@ workspace=./my-workspace
 
 ### 环境变量文件格式 (.mdde.env)
 ```bash
-mdde_host=http://192.168.2.5:3000
+host=http://192.168.2.5:3000
 container_name=my-container
 debug_port=5000
 workspace=./my-workspace

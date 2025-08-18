@@ -142,7 +142,7 @@ CLI 工具使用 `.mdde.env` 文件进行配置:
 
 ```bash
 # .mdde.env
-mdde_host=http://localhost:3000
+host=http://localhost:3000
 container_name=my-project
 debug_port=5000
 workspace=./workspace

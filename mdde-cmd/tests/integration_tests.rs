@@ -3,7 +3,7 @@ use mdde::{Config, http::MddeClient, MddeError};
 #[tokio::test]
 async fn test_config_default() {
     let config = Config::default();
-    assert_eq!(config.mdde_host, "http://192.168.2.5:3000");
+    assert_eq!(config.host, "http://192.168.2.5:3000");
     assert!(config.container_name.is_none());
     assert!(config.debug_port.is_none());
     assert!(config.workspace.is_none());
@@ -12,14 +12,14 @@ async fn test_config_default() {
 #[tokio::test]
 async fn test_config_save_and_load() {
     let mut config = Config::default();
-    config.mdde_host = "http://localhost:3000".to_string();
+    config.host = "http://localhost:3000".to_string();
     
     // 保存配置
     assert!(config.save().await.is_ok());
     
     // 重新加载配置
     let loaded_config = Config::load().await.unwrap();
-    assert_eq!(loaded_config.mdde_host, "http://localhost:3000");
+    assert_eq!(loaded_config.host, "http://localhost:3000");
 }
 
 #[tokio::test]

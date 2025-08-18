@@ -66,7 +66,7 @@ mdde env --del app_port
 
 | 旧名称 | 新名称 | 说明 |
 |--------|--------|------|
-| `mdde_host` | `host` | MDDE 服务器地址 |
+| `host` | `host` | MDDE 服务器地址 |
 | `debug_port` | `app_port` | 应用端口映射 |
 
 ## 输入验证

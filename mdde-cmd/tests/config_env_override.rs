@@ -14,14 +14,14 @@ async fn test_config_load_with_env_override() {
     std::env::set_current_dir(&temp_dir).unwrap();
     
     // 创建 .mdde.env 文件
-    let env_content = "mdde_host=http://localhost:8080\n";
+    let env_content = "host=http://localhost:8080\n";
     fs::write(".mdde.env", env_content).unwrap();
     
     // 测试配置加载
     let config = Config::load().await.unwrap();
     
-    // 验证 mdde_host 被 .mdde.env 覆盖
-    assert_eq!(config.mdde_host, "http://localhost:8080");
+    // 验证 host 被 .mdde.env 覆盖
+    assert_eq!(config.host, "http://localhost:8080");
     
     // 清理
     fs::remove_file(".mdde.env").unwrap();
@@ -40,7 +40,7 @@ async fn test_config_load_without_env_file() {
     let config = Config::load().await.unwrap();
     
     // 验证使用默认值
-    assert_eq!(config.mdde_host, "http://192.168.2.5:3000");
+    assert_eq!(config.host, "http://192.168.2.5:3000");
 }
 
 #[tokio::test]
@@ -53,7 +53,7 @@ async fn test_env_file_parsing() {
     
     // 创建包含注释和空行的 .mdde.env 文件
     let env_content = r#"# 这是注释行
-mdde_host=http://test-server:9000
+host=http://test-server:9000
 
 # 空行应该被忽略
 container_name=test-container
@@ -66,7 +66,7 @@ debug_port=5000
     let env_vars = Config::load_env_file().await.unwrap();
     
     // 验证解析结果
-    assert_eq!(env_vars.get("mdde_host"), Some(&"http://test-server:9000".to_string()));
+    assert_eq!(env_vars.get("host"), Some(&"http://test-server:9000".to_string()));
     assert_eq!(env_vars.get("container_name"), Some(&"test-container".to_string()));
     assert_eq!(env_vars.get("debug_port"), Some(&"5000".to_string()));
     
@@ -89,7 +89,7 @@ async fn test_config_save_and_load() {
     
     // 创建测试配置
     let mut test_config = Config::default();
-    test_config.mdde_host = "http://test-server:9000".to_string();
+    test_config.host = "http://test-server:9000".to_string();
     test_config.container_name = Some("test-container".to_string());
     test_config.debug_port = Some(5000);
     test_config.workspace = Some(PathBuf::from("./test-workspace"));
@@ -104,7 +104,7 @@ async fn test_config_save_and_load() {
     let loaded_config = Config::load().await.unwrap();
     
     // 验证配置被正确保存和加载
-    assert_eq!(loaded_config.mdde_host, "http://test-server:9000");
+    assert_eq!(loaded_config.host, "http://test-server:9000");
     assert_eq!(loaded_config.container_name, Some("test-container".to_string()));
     assert_eq!(loaded_config.debug_port, Some(5000));
     assert_eq!(loaded_config.workspace, Some(PathBuf::from("./test-workspace")));
