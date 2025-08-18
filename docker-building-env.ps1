@@ -1,0 +1,1 @@
+docker build -t luqizheng/mdde-cmd-building-env:latest .

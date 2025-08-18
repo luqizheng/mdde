@@ -1,9 +1,7 @@
 # Rust 构建产物
-/target/
+/mdde-cmd/target/
 **/*.rs.bk
 Cargo.lock
-
-node_modules/
 
 # IDE 文件
 .vscode/
@@ -41,3 +39,6 @@ coverage/
 
 
 
+
+# MDDE 配置目录
+.mdde/

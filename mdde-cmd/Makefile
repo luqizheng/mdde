@@ -1,14 +1,14 @@
 # MDDE Makefile
 # 简化构建和开发流程
 
-.PHONY: help build test clean install uninstall release debug check fmt clippy doc
+.PHONY: help build test clean install uninstall release debug check fmt clippy doc cross-build build-windows build-linux build-macos build-macos-arm install-targets check-all clean-cross
 
 # 默认目标
 help:
 	@echo "MDDE 命令行工具构建系统"
 	@echo "========================"
 	@echo ""
-	@echo "可用命令:"
+	@echo "基础命令:"
 	@echo "  build     - 构建项目 (debug)"
 	@echo "  release   - 构建项目 (release)"
 	@echo "  test      - 运行测试"
@@ -19,6 +19,18 @@ help:
 	@echo "  clean     - 清理构建产物"
 	@echo "  install   - 安装到系统"
 	@echo "  uninstall - 从系统卸载"
+	@echo ""
+	@echo "跨平台编译:"
+	@echo "  cross-build    - 编译所有平台版本"
+	@echo "  build-windows  - 编译 Windows 版本"
+	@echo "  build-linux    - 编译 Linux 版本"
+	@echo "  build-macos    - 编译 macOS Intel 版本"
+	@echo "  build-macos-arm- 编译 macOS Apple Silicon 版本"
+	@echo "  install-targets- 安装所有编译目标"
+	@echo "  check-all      - 检查所有平台编译"
+	@echo "  clean-cross    - 清理跨平台构建产物"
+	@echo ""
+	@echo "工具命令:"
 	@echo "  help      - 显示此帮助信息"
 
 # 构建项目 (debug)
@@ -102,6 +114,43 @@ coverage:
 	grcov . --binary-path ./target/debug/ -s . -t html --branch --ignore-not-existing -o ./coverage/
 	@echo "覆盖率报告已生成到 ./coverage/ 目录"
 
+# 跨平台编译目标
+cross-build: prep
+	@echo "开始跨平台编译..."
+ifeq ($(OS),Windows_NT)
+	powershell -ExecutionPolicy Bypass -File ./build-cross-platform.ps1
+else
+	./build-cross-platform.sh
+endif
 
+# 特定平台编译
+build-windows:
+	cargo build --release --target x86_64-pc-windows-msvc
 
+build-linux:
+	cargo build --release --target x86_64-unknown-linux-gnu
+
+build-macos:
+	cargo build --release --target x86_64-apple-darwin
+
+build-macos-arm:
+	cargo build --release --target aarch64-apple-darwin
+
+# 安装编译目标
+install-targets:
+	rustup target add x86_64-pc-windows-msvc
+	rustup target add x86_64-unknown-linux-gnu
+	rustup target add x86_64-apple-darwin
+	rustup target add aarch64-apple-darwin
+
+# 清理跨平台构建
+clean-cross:
+	rm -rf release-builds/
+
+# 检查所有平台编译
+check-all:
+	cargo check --target x86_64-pc-windows-msvc
+	cargo check --target x86_64-unknown-linux-gnu
+	cargo check --target x86_64-apple-darwin
+	cargo check --target aarch64-apple-darwin
 
