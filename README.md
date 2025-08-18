@@ -262,16 +262,19 @@ git push origin feature/your-feature
 # 5. 创建 Pull Request
 ```
 
-### 本地构建所有平台
+### 本地构建
 
-如果需要本地构建所有平台，可以使用现有的构建脚本：
+如果需要本地构建当前平台的版本：
 
 ```bash
-# Windows (PowerShell)
-.\build-installer.ps1
+# 进入项目目录
+cd mdde-cmd
 
-# Linux/macOS (Bash)
-./build-installer.sh
+# 构建发布版本
+cargo build --release
+
+# 安装到系统
+cargo install --path .
 ```
 
 ## 🤝 贡献
