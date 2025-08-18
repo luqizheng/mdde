@@ -1,5 +1,8 @@
 # MDDE 命令行工具
 
+[![Build and Release](https://github.com/luqizheng/mdde/actions/workflows/build.yml/badge.svg)](https://github.com/luqizheng/mdde/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 一个基于 Rust 编写的跨平台命令行工具，用于管理 Docker 多语言开发环境。
 
 ## 🚀 功能特性
@@ -12,15 +15,51 @@
 
 ## 🛠️ 安装和运行
 
-### 前置要求
+### 方式一：下载预编译二进制文件（推荐）
+
+1. **前往 [Releases 页面](https://github.com/luqizheng/mdde/releases/latest) 下载对应平台的二进制文件**
+
+   - **Linux (x64)**: `mdde-linux-x64` 或 `mdde-linux-x64.tar.gz`
+   - **Windows (x64)**: `mdde-windows-x64.exe` 或 `mdde-windows-x64.zip`
+   - **macOS (Intel)**: `mdde-macos-x64` 或 `mdde-macos-x64.tar.gz`
+   - **macOS (Apple Silicon)**: `mdde-macos-arm64` 或 `mdde-macos-arm64.tar.gz`
+
+2. **安装二进制文件**
+
+   **Linux/macOS:**
+   ```bash
+   # 下载后重命名并移动到 PATH 目录
+   mv mdde-linux-x64 /usr/local/bin/mdde
+   chmod +x /usr/local/bin/mdde
+   
+   # 或者对于 macOS
+   mv mdde-macos-x64 /usr/local/bin/mdde
+   chmod +x /usr/local/bin/mdde
+   ```
+
+   **Windows:**
+   ```powershell
+   # 将 mdde-windows-x64.exe 重命名为 mdde.exe
+   # 并将其移动到 PATH 环境变量中的目录
+   ```
+
+3. **验证安装**
+   ```bash
+   mdde --help
+   mdde version
+   ```
+
+### 方式二：从源码构建
+
+#### 前置要求
 - Rust 1.70+
 - Docker (已安装并添加到 PATH)
 
-### 快速开始
+#### 构建步骤
 
 1. **克隆项目**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/luqizheng/mdde.git
    cd mdde-cmd
    ```
 
@@ -29,7 +68,12 @@
    cargo build --release
    ```
 
-3. **运行示例**
+3. **安装到系统**
+   ```bash
+   cargo install --path .
+   ```
+
+4. **运行示例**
    ```bash
    # Docker 命令示例
    cargo run --example docker_usage
@@ -156,9 +200,92 @@ mdde-cmd/
 3. **网络配置**: HTTP 客户端需要网络连接
 4. **配置优先级**: `.mdde.env` 文件会覆盖其他配置
 
+## 🚀 CI/CD 流程
+
+本项目使用 GitHub Actions 进行自动化构建和发布：
+
+### 自动构建
+
+- **触发条件**: 推送到 `main`、`develop` 分支或创建 Pull Request
+- **构建平台**: Linux x64、Windows x64、macOS Intel、macOS Apple Silicon
+- **构建产物**: 自动上传到 GitHub Actions Artifacts
+
+### 自动发布
+
+- **触发条件**: 推送 `v*` 格式的 Git 标签（如 `v1.0.0`）
+- **发布内容**: 
+  - 跨平台二进制文件
+  - 压缩包格式（tar.gz 和 zip）
+  - 自动生成发布说明
+
+### 创建新版本
+
+1. **更新版本号**
+   ```bash
+   # 更新 mdde-cmd/Cargo.toml 中的版本号
+   sed -i 's/version = "0.1.0"/version = "0.2.0"/' mdde-cmd/Cargo.toml
+   ```
+
+2. **提交并创建标签**
+   ```bash
+   git add .
+   git commit -m "chore: bump version to v0.2.0"
+   git tag v0.2.0
+   git push origin main --tags
+   ```
+
+3. **自动发布**
+   - GitHub Actions 将自动构建所有平台
+   - 创建新的 Release 页面
+   - 上传二进制文件和压缩包
+
+### 开发工作流
+
+```bash
+# 1. Fork 并克隆项目
+git clone https://github.com/your-username/mdde.git
+cd mdde
+
+# 2. 创建功能分支
+git checkout -b feature/your-feature
+
+# 3. 进行开发和测试
+cd mdde-cmd
+cargo test
+cargo clippy -- -D warnings
+cargo fmt -- --check
+
+# 4. 提交更改
+git commit -m "feat: add your feature"
+git push origin feature/your-feature
+
+# 5. 创建 Pull Request
+```
+
+### 本地构建所有平台
+
+如果需要本地构建所有平台，可以使用现有的构建脚本：
+
+```bash
+# Windows (PowerShell)
+.\build-installer.ps1
+
+# Linux/macOS (Bash)
+./build-installer.sh
+```
+
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+### 贡献指南
+
+1. **报告问题**: 使用 [Issue 模板](https://github.com/luqizheng/mdde/issues/new) 报告 bug 或请求新功能
+2. **代码贡献**: 
+   - Fork 项目并创建功能分支
+   - 确保代码通过所有测试和检查
+   - 提交 Pull Request 等待审核
+3. **文档改进**: 欢迎改进文档和示例代码
 
 ## 📄 许可证
 
