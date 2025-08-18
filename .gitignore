@@ -1,5 +1,5 @@
 # Rust 构建产物
-/target/
+/mdde-cmd/target/
 **/*.rs.bk
 Cargo.lock
 
@@ -39,3 +39,6 @@ coverage/
 
 
 
+
+# MDDE 配置目录
+.mdde/

@@ -212,6 +212,30 @@ impl DockerCommand {
         }
     }
 
+    /// 进入容器进行交互式操作
+    pub fn exec_interactive(container: &str, shell: &str) -> Result<(), DockerError> {
+        use std::process::Stdio;
+        
+        let mut cmd = Command::new("docker");
+        cmd.arg("exec")
+            .arg("-it")
+            .arg(container)
+            .arg(shell)
+            .stdin(Stdio::inherit())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+        
+        let status = cmd.status()
+            .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
+        
+        if status.success() {
+            Ok(())
+        } else {
+            Err(DockerError::CommandFailed(format!("交互式执行失败，退出代码: {}", 
+                status.code().unwrap_or(-1))))
+        }
+    }
+
     /// 获取容器日志
     pub fn logs(container: &str, tail: Option<u32>) -> Result<String, DockerError> {
         let mut cmd = Command::new("docker");

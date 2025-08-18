@@ -38,6 +38,9 @@ pub enum MddeError {
     #[error("无效的输入: {0}")]
     InvalidInput(String),
 
+    #[error("无效的端口格式: {0}")]
+    InvalidPortFormat(String),
+
     #[error("容器未运行: {0}")]
     ContainerNotRunning(String),
 

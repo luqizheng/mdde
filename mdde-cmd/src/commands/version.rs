@@ -1,14 +1,15 @@
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 
 pub async fn execute() -> Result<(), MddeError> {
-    println!("{}", "MDDE 命令行工具".blue().bold());
+    println!("{}", i18n::t("mdde_cli_tool").blue().bold());
     println!("{}", "=".repeat(30));
-    println!("版本: {}", env!("CARGO_PKG_VERSION").green());
-    println!("作者: {}", env!("CARGO_PKG_AUTHORS").cyan());
-    println!("描述: {}", env!("CARGO_PKG_DESCRIPTION").yellow());
-    println!("许可证: {}", env!("CARGO_PKG_LICENSE").magenta());
-    println!("仓库: {}", env!("CARGO_PKG_REPOSITORY").blue());
+    println!("{}", i18n::tf("version", &[&env!("CARGO_PKG_VERSION").green()]));
+    println!("{}", i18n::tf("author", &[&env!("CARGO_PKG_AUTHORS").cyan()]));
+    println!("{}", i18n::tf("description", &[&env!("CARGO_PKG_DESCRIPTION").yellow()]));
+    println!("{}", i18n::tf("license", &[&env!("CARGO_PKG_LICENSE").magenta()]));
+    println!("{}", i18n::tf("repository", &[&env!("CARGO_PKG_REPOSITORY").blue()]));
     println!("{}", "=".repeat(30));
 
     Ok(())

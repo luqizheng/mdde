@@ -1,6 +1,7 @@
 use crate::cli::OutputFormat;
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use serde_json::json;
 use std::process::Command;
@@ -10,20 +11,21 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
     info!("查看开发环境状态");
 
     // 检查 docker-compose.yml 文件是否存在
-    let compose_file = std::env::current_dir()?.join("docker-compose.yml");
+    let compose_file = std::env::current_dir()?.join(".mdde").join("docker-compose.yml");
     if !compose_file.exists() {
         return Err(MddeError::FileOperation("docker-compose.yml 文件不存在".to_string()));
     }
 
     // 检查 .mdde.env 文件是否存在
-    let env_file = std::env::current_dir()?.join(".mdde.env");
+    let env_file = std::env::current_dir()?.join(".mdde").join("cfg.env");
     if !env_file.exists() {
-        return Err(MddeError::FileOperation(".mdde.env 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(".mdde/cfg.env 文件不存在".to_string()));
     }
 
     // 获取 docker-compose 状态
     let mut cmd = Command::new("docker-compose");
-    cmd.arg("--env-file").arg(".mdde.env");
+    cmd.arg("--env-file").arg(".mdde/cfg.env");
+    cmd.arg("--file").arg(".mdde/docker-compose.yml");
     cmd.arg("ps");
 
     let output = cmd.output()?;
@@ -37,7 +39,7 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
 
     match format {
         OutputFormat::Table => {
-            println!("{}", "开发环境状态:".yellow());
+            println!("{}", i18n::t("environment_status").yellow());
             println!("{}", status_output);
         }
         OutputFormat::Json => {

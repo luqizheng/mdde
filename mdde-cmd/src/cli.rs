@@ -1,4 +1,4 @@
-use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run};
+use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run, exec, env};
 use crate::config::Config;
 use crate::error::MddeError;
 use clap::{Parser, Subcommand};
@@ -16,23 +16,23 @@ pub struct Cli {
 pub enum Commands {
     /// 初始化 mdde 相关配置
     Init {
-        /// mdde 服务器地址
-        #[arg(long, default_value = "http://192.168.2.5:3000")]
-        host: String,
+        /// mdde 服务器地址 (可选，未指定时将交互式询问)
+        #[arg(long)]
+        host: Option<String>,
     },
 
     /// 创建新的开发环境
     Create {
-        /// 开发环境类型 (如: dotnet9, java18, java19_tomcat)
-        dev_env: String,
+        /// 开发环境类型 (如: dotnet9, java18, java19_tomcat) [可选，未指定时将交互式询问]
+        dev_env: Option<String>,
         
-        /// 环境名称
+        /// 环境名称 [可选，未指定时将交互式询问]
         #[arg(short, long)]
-        name: String,
+        name: Option<String>,
         
-        /// 调试端口
+        /// 应用端口 (格式: host_port:container_port)
         #[arg(long)]
-        debug_port: Option<u16>,
+        app_port: Option<String>,
         
         /// 工作目录路径
         #[arg(short, long)]
@@ -64,6 +64,13 @@ pub enum Commands {
         command: Vec<String>,
     },
 
+    /// 进入容器进行交互式操作 (相当于 docker exec -it /bin/bash)
+    Exec {
+        /// 要执行的命令，默认为 /bin/bash
+        #[arg(default_value = "/bin/bash")]
+        shell: String,
+    },
+
     /// 查看所有开发环境的状态
     Status {
         /// 输出格式
@@ -73,18 +80,20 @@ pub enum Commands {
 
     /// 查看指定环境的日志
     Logs {
- 
+        /// 显示最后 N 行 (位置参数，可直接写数字，如: mdde logs 50)
+        lines: Option<usize>,
+        
+        /// 显示最后 N 行
+        #[arg(short = 'l', long)]
+        tail: Option<usize>,
+        
+        /// 显示所有日志
+        #[arg(short = 'a', long)]
+        all: bool,
+        
         /// 实时跟踪日志
         #[arg(short, long)]
         follow: bool,
-        
-        /// 显示最后 N 行
-        #[arg(long)]
-        tail: Option<usize>,
-        
-        /// 显示指定时间后的日志
-        #[arg(long)]
-        since: Option<String>,
     },
 
     /// 清理未使用的 Docker 资源
@@ -111,6 +120,21 @@ pub enum Commands {
 
     /// 显示版本信息
     Version,
+
+    /// 管理环境变量配置文件
+    Env {
+        /// 设置环境变量 (格式: key=value)
+        #[arg(long,short)]
+        set: Option<String>,
+        
+        /// 显示所有环境变量
+        #[arg(long,short)]
+        ls: bool,
+        
+        /// 删除环境变量
+        #[arg(long,short)]
+        del: Option<String>,
+    },
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
@@ -124,22 +148,26 @@ impl Cli {
     pub async fn execute(self, config: Config) -> Result<(), MddeError> {
         match self.command {
             Commands::Init { host } => init::execute(host, config).await,
-            Commands::Create { dev_env, name, debug_port, workspace } => {
-                create::execute(dev_env, name, debug_port, workspace, config).await
+            Commands::Create { dev_env, name, app_port, workspace } => {
+                create::execute(dev_env, name, app_port, workspace, config).await
             }
             Commands::Start { detach } => start::execute(detach, config).await,
             Commands::Stop {  remove } => stop::execute( remove, config).await,
             Commands::Restart => restart::execute(config).await,
             Commands::Run { command } => run::execute(command, config).await,
+            Commands::Exec { shell } => exec::execute(shell, config).await,
             Commands::Status { format } => status::execute(format, config).await,
-            Commands::Logs {  follow, tail, since } => {
-                logs::execute( follow, tail, since, config).await
+            Commands::Logs { lines, tail, all, follow } => {
+                logs::execute(lines, tail, all, follow, config).await
             }
             Commands::Clean { all, images, containers, volumes } => {
                 clean::execute(all, images, containers, volumes, config).await
             }
             Commands::Doctor => doctor::execute(config).await,
             Commands::Version => version::execute().await,
+            Commands::Env { set, ls, del } => {
+                env::execute(set, ls, del, config).await
+            }
         }
     }
 }

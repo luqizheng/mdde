@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use std::process::Command;
 use tracing::info;
@@ -35,12 +36,12 @@ fn check_docker() -> Result<(), MddeError> {
     match output {
         Ok(output) if output.status.success() => {
             let version = String::from_utf8_lossy(&output.stdout);
-            println!("{}", "✓ Docker 已安装".green());
-            println!("  版本: {}", version.trim());
+            println!("{}", i18n::t("docker_installed").green());
+            println!("{}", i18n::tf("docker_version", &[&version.trim()]));
         }
         _ => {
-            println!("{}", "✗ Docker 未安装或无法访问".red());
-            println!("  请安装 Docker Desktop 或 Docker Engine");
+            println!("{}", i18n::t("docker_not_installed").red());
+            println!("{}", i18n::t("install_docker"));
             return Err(MddeError::Docker("Docker 未安装".to_string()));
         }
     }
@@ -49,11 +50,11 @@ fn check_docker() -> Result<(), MddeError> {
     let output = Command::new("docker").arg("info").output();
     match output {
         Ok(output) if output.status.success() => {
-            println!("{}", "✓ Docker 服务运行正常".green());
+            println!("{}", i18n::t("docker_running").green());
         }
         _ => {
-            println!("{}", "✗ Docker 服务未运行".red());
-            println!("  请启动 Docker 服务");
+            println!("{}", i18n::t("docker_not_running").red());
+            println!("{}", i18n::t("start_docker"));
             return Err(MddeError::Docker("Docker 服务未运行".to_string()));
         }
     }
@@ -62,18 +63,18 @@ fn check_docker() -> Result<(), MddeError> {
 }
 
 fn check_docker_compose() -> Result<(), MddeError> {
-    println!("{}", "\n📦 检查 Docker Compose...".cyan());
+    println!("{}", format!("\n{}", i18n::t("check_docker_compose")).cyan());
 
     let output = Command::new("docker-compose").arg("--version").output();
     match output {
         Ok(output) if output.status.success() => {
             let version = String::from_utf8_lossy(&output.stdout);
-            println!("{}", "✓ Docker Compose 已安装".green());
-            println!("  版本: {}", version.trim());
+            println!("{}", i18n::t("docker_compose_installed").green());
+            println!("{}", i18n::tf("docker_version", &[&version.trim()]));
         }
         _ => {
-            println!("{}", "✗ Docker Compose 未安装".red());
-            println!("  请安装 Docker Compose");
+            println!("{}", i18n::t("docker_compose_not_installed").red());
+            println!("{}", i18n::t("install_docker_compose"));
             return Err(MddeError::Docker("Docker Compose 未安装".to_string()));
         }
     }
@@ -82,25 +83,25 @@ fn check_docker_compose() -> Result<(), MddeError> {
 }
 
 async fn check_network_connection(config: &Config) -> Result<(), MddeError> {
-    println!("{}", "\n🌐 检查网络连接...".cyan());
+    println!("{}", format!("\n{}", i18n::t("check_network")).cyan());
 
     let client = reqwest::Client::new();
-    let response = client.get(&config.mdde_host).send().await;
+    let response = client.get(&config.host).send().await;
 
     match response {
         Ok(response) if response.status().is_success() => {
-            println!("{}", "✓ 网络连接正常".green());
-            println!("  服务器: {}", config.mdde_host);
+            println!("{}", i18n::t("network_ok").green());
+            println!("{}", i18n::tf("network_server", &[&config.host]));
         }
         Ok(response) => {
-            println!("{}", "⚠ 服务器响应异常".yellow());
-            println!("  状态码: {}", response.status());
-            println!("  服务器: {}", config.mdde_host);
+            println!("{}", i18n::t("server_response_error").yellow());
+            println!("{}", i18n::tf("status_code", &[&response.status()]));
+            println!("{}", i18n::tf("network_server", &[&config.host]));
         }
         Err(e) => {
-            println!("{}", "✗ 网络连接失败".red());
-            println!("  错误: {}", e);
-            println!("  服务器: {}", config.mdde_host);
+            println!("{}", i18n::t("network_failed").red());
+            println!("{}", i18n::tf("error_msg", &[&e]));
+            println!("{}", i18n::tf("network_server", &[&config.host]));
         }
     }
 
@@ -108,7 +109,7 @@ async fn check_network_connection(config: &Config) -> Result<(), MddeError> {
 }
 
 fn check_config_files() -> Result<(), MddeError> {
-    println!("{}", "\n📁 检查配置文件...".cyan());
+    println!("{}", format!("\n{}", i18n::t("check_config_files")).cyan());
 
     // 检查当前目录的配置文件
     let current_dir = std::env::current_dir()?;
@@ -116,17 +117,17 @@ fn check_config_files() -> Result<(), MddeError> {
     let env_file = current_dir.join(".mdde.env");
 
     if compose_file.exists() {
-        println!("{}", "✓ docker-compose.yml 存在".green());
+        println!("{}", i18n::t("docker_compose_exists").green());
     } else {
-        println!("{}", "⚠ docker-compose.yml 不存在".yellow());
-        println!("  当前目录: {}", current_dir.display());
+        println!("{}", i18n::t("docker_compose_not_exists").yellow());
+        println!("{}", i18n::tf("current_dir", &[&current_dir.display()]));
     }
 
     if env_file.exists() {
-        println!("{}", "✓ .mdde.env 存在".green());
+        println!("{}", i18n::t("mdde_env_exists").green());
     } else {
-        println!("{}", "⚠ .mdde.env 不存在".yellow());
-        println!("  当前目录: {}", current_dir.display());
+        println!("{}", i18n::t("mdde_env_not_exists").yellow());
+        println!("{}", i18n::tf("current_dir", &[&current_dir.display()]));
     }
 
     Ok(())

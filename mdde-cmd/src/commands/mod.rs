@@ -9,3 +9,5 @@ pub mod clean;
 pub mod doctor;
 pub mod version;
 pub mod run;
+pub mod exec;
+pub mod env;

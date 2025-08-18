@@ -1,0 +1,24 @@
+欢迎安装 MDDE (Multi Docker Development Environment)！
+
+MDDE 是一个基于 Rust 开发的跨平台命令行工具，专为管理 Docker 多语言开发环境而设计。
+
+主要功能：
+• 支持 .NET、Java、Node.js、Python 等多种开发环境
+• 简单的命令行接口，易于使用
+• 自动化的环境创建和管理
+• 跨平台支持 (Windows/Linux/macOS)
+• 与 Docker 生态系统完全集成
+
+系统要求：
+• Windows 10 或更高版本 (64位)
+• Docker Desktop (需要单独安装)
+• 至少 100MB 可用磁盘空间
+
+安装说明：
+1. 确保 Docker Desktop 已安装并正在运行
+2. 选择安装目录（建议使用默认路径）
+3. 建议选择"添加到系统 PATH 环境变量"选项
+4. 安装完成后可以在命令行中直接使用 "mdde" 命令
+
+注意：安装程序需要管理员权限才能修改系统环境变量。
+
