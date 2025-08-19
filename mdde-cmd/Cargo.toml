@@ -43,7 +43,7 @@ url = "2.4"
 # 其他工具
 chrono = { version = "0.4", features = ["serde"] }
 colored = "2.0"
-indicatif = "0.17"
+indicatif = "0.18"
 tempfile = "3.8"
 
 [dev-dependencies]
