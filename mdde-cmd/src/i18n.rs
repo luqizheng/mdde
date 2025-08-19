@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::env;
-use std::sync::OnceLock;
+use std::sync::{OnceLock, RwLock};
 
 /// 支持的语言类型
 #[derive(Debug, Clone, PartialEq)]
@@ -20,22 +20,32 @@ impl Language {
 }
 
 /// 全局语言设置
-static LANGUAGE: OnceLock<Language> = OnceLock::new();
+static LANGUAGE: RwLock<Option<Language>> = RwLock::new(None);
 
 /// 初始化语言设置
 pub fn init_language() {
     let lang = detect_system_language();
-    LANGUAGE.set(lang).ok();
+    if let Ok(mut language) = LANGUAGE.write() {
+        if language.is_none() {
+            *language = Some(lang);
+        }
+    }
 }
 
 /// 获取当前语言
-pub fn get_language() -> &'static Language {
-    LANGUAGE.get().unwrap_or(&Language::English)
+pub fn get_language() -> Language {
+    if let Ok(language) = LANGUAGE.read() {
+        language.clone().unwrap_or(Language::English)
+    } else {
+        Language::English
+    }
 }
 
 /// 设置语言
 pub fn set_language(lang: Language) {
-    LANGUAGE.set(lang).ok();
+    if let Ok(mut language) = LANGUAGE.write() {
+        *language = Some(lang);
+    }
 }
 
 /// 检测系统语言
@@ -137,8 +147,8 @@ fn get_messages() -> &'static HashMap<MessageKey, (String, String)> {
         messages.insert("docker_compose_exists", ("✓ docker-compose.yml exists".to_string(), "✓ docker-compose.yml 存在".to_string()));
         messages.insert("docker_compose_not_exists", ("⚠ docker-compose.yml does not exist".to_string(), "⚠ docker-compose.yml 不存在".to_string()));
         messages.insert("current_dir", ("  Current directory: {}".to_string(), "  当前目录: {}".to_string()));
-        messages.insert("mdde_env_exists", ("✓ .mdde.env exists".to_string(), "✓ .mdde.env 存在".to_string()));
-        messages.insert("mdde_env_not_exists", ("⚠ .mdde.env does not exist".to_string(), "⚠ .mdde.env 不存在".to_string()));
+        messages.insert("mdde_env_exists", ("✓ .mdde/cfg.env exists".to_string(), "✓ .mdde/cfg.env 存在".to_string()));
+        messages.insert("mdde_env_not_exists", ("⚠ .mdde/cfg.env does not exist".to_string(), "⚠ .mdde/cfg.env 不存在".to_string()));
         
         // 启动相关
         messages.insert("starting_environment", ("Starting development environment...".to_string(), "启动开发环境...".to_string()));
@@ -240,19 +250,31 @@ mod tests {
 
     #[test]
     fn test_translation() {
-        // 设置中文
+        // 测试中文
         set_language(Language::Chinese);
         assert_eq!(t("clean_completed"), "✓ 清理完成");
         
-        // 设置英文
+        // 测试英文
         set_language(Language::English);
         assert_eq!(t("clean_completed"), "✓ Cleanup completed");
+        
+        // 重置为英文，避免影响其他测试
+        set_language(Language::English);
     }
 
     #[test]
     fn test_formatted_translation() {
+        // 确保使用英文
         set_language(Language::English);
         let result = tf("server_address", &[&"http://localhost:3000"]);
         assert_eq!(result, "Server address: http://localhost:3000");
+        
+        // 测试中文格式化
+        set_language(Language::Chinese);
+        let result_zh = tf("server_address", &[&"http://localhost:3000"]);
+        assert_eq!(result_zh, "服务器地址: http://localhost:3000");
+        
+        // 重置为英文，避免影响其他测试
+        set_language(Language::English);
     }
 }

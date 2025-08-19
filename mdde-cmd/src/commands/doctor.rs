@@ -114,7 +114,7 @@ fn check_config_files() -> Result<(), MddeError> {
     // 检查当前目录的配置文件
     let current_dir = std::env::current_dir()?;
     let compose_file = current_dir.join("docker-compose.yml");
-    let env_file = current_dir.join(".mdde.env");
+    let env_file = current_dir.join(".mdde").join("cfg.env");
 
     if compose_file.exists() {
         println!("{}", i18n::t("docker_compose_exists").green());
