@@ -1,8 +1,8 @@
 //! MDDE 基本使用示例
-//! 
+//!
 //! 这个示例展示了如何使用 MDDE 命令行工具的基本功能
 
-use mdde::{Config, http::MddeClient};
+use mdde::{http::MddeClient, Config};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 2. 创建 HTTP 客户端
     println!("\n2. 创建 HTTP 客户端...");
     let client = MddeClient::new(&config.host);
-    
+
     // 3. 测试连接
     println!("\n3. 测试服务器连接...");
     match client.ping().await {

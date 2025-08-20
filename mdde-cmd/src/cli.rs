@@ -1,4 +1,6 @@
-use crate::commands::{init, create, start, stop, restart, status, logs, clean, doctor, version, run, exec, env};
+use crate::commands::{
+    clean, create, doctor, env, exec, init, logs, restart, run, start, status, stop, version,
+};
 use crate::config::Config;
 use crate::error::MddeError;
 use clap::{Parser, Subcommand};
@@ -25,15 +27,15 @@ pub enum Commands {
     Create {
         /// 开发环境类型 (如: dotnet9, java18, java19_tomcat) [可选，未指定时将交互式询问]
         dev_env: Option<String>,
-        
+
         /// 环境名称 [可选，未指定时将交互式询问]
         #[arg(short, long)]
         name: Option<String>,
-        
+
         /// 应用端口 (格式: host_port:container_port)
         #[arg(long)]
         app_port: Option<String>,
-        
+
         /// 工作目录路径
         #[arg(short, long)]
         workspace: Option<String>,
@@ -48,14 +50,13 @@ pub enum Commands {
 
     /// 停止指定的开发环境
     Stop {
-     
         /// 停止后删除容器
         #[arg(long)]
         remove: bool,
     },
 
     /// 重启指定的开发环境
-    Restart ,
+    Restart,
 
     /// 在容器中执行命令
     Run {
@@ -82,15 +83,15 @@ pub enum Commands {
     Logs {
         /// 显示最后 N 行 (位置参数，可直接写数字，如: mdde logs 50)
         lines: Option<usize>,
-        
+
         /// 显示最后 N 行
         #[arg(short = 'l', long)]
         tail: Option<usize>,
-        
+
         /// 显示所有日志
         #[arg(short = 'a', long)]
         all: bool,
-        
+
         /// 实时跟踪日志
         #[arg(short, long)]
         follow: bool,
@@ -101,15 +102,15 @@ pub enum Commands {
         /// 清理所有未使用的资源
         #[arg(long)]
         all: bool,
-        
+
         /// 清理未使用的镜像
         #[arg(long)]
         images: bool,
-        
+
         /// 清理未使用的容器
         #[arg(long)]
         containers: bool,
-        
+
         /// 清理未使用的卷
         #[arg(long)]
         volumes: bool,
@@ -124,15 +125,15 @@ pub enum Commands {
     /// 管理环境变量配置文件
     Env {
         /// 设置环境变量 (格式: key=value)
-        #[arg(long,short)]
+        #[arg(long, short)]
         set: Option<String>,
-        
+
         /// 显示所有环境变量
-        #[arg(long,short)]
+        #[arg(long, short)]
         ls: bool,
-        
+
         /// 删除环境变量
-        #[arg(long,short)]
+        #[arg(long, short)]
         del: Option<String>,
     },
 }
@@ -148,26 +149,33 @@ impl Cli {
     pub async fn execute(self, config: Config) -> Result<(), MddeError> {
         match self.command {
             Commands::Init { host } => init::execute(host, config).await,
-            Commands::Create { dev_env, name, app_port, workspace } => {
-                create::execute(dev_env, name, app_port, workspace, config).await
-            }
+            Commands::Create {
+                dev_env,
+                name,
+                app_port,
+                workspace,
+            } => create::execute(dev_env, name, app_port, workspace, config).await,
             Commands::Start { detach } => start::execute(detach, config).await,
-            Commands::Stop {  remove } => stop::execute( remove, config).await,
+            Commands::Stop { remove } => stop::execute(remove, config).await,
             Commands::Restart => restart::execute(config).await,
             Commands::Run { command } => run::execute(command, config).await,
             Commands::Exec { shell } => exec::execute(shell, config).await,
             Commands::Status { format } => status::execute(format, config).await,
-            Commands::Logs { lines, tail, all, follow } => {
-                logs::execute(lines, tail, all, follow, config).await
-            }
-            Commands::Clean { all, images, containers, volumes } => {
-                clean::execute(all, images, containers, volumes, config).await
-            }
+            Commands::Logs {
+                lines,
+                tail,
+                all,
+                follow,
+            } => logs::execute(lines, tail, all, follow, config).await,
+            Commands::Clean {
+                all,
+                images,
+                containers,
+                volumes,
+            } => clean::execute(all, images, containers, volumes, config).await,
             Commands::Doctor => doctor::execute(config).await,
             Commands::Version => version::execute().await,
-            Commands::Env { set, ls, del } => {
-                env::execute(set, ls, del, config).await
-            }
+            Commands::Env { set, ls, del } => env::execute(set, ls, del, config).await,
         }
     }
 }

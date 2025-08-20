@@ -80,7 +80,7 @@ fn main() -> Result<(), DockerError> {
         Ok(exists) => {
             if exists {
                 println!("✅ 容器 '{}' 存在", test_container);
-                
+
                 // 检查是否正在运行
                 match DockerCommand::container_running(test_container) {
                     Ok(running) => {
@@ -102,7 +102,7 @@ fn main() -> Result<(), DockerError> {
     // 7. 演示容器操作（如果存在的话）
     if let Ok(true) = DockerCommand::container_exists(test_container) {
         println!("\n7. 演示容器操作...");
-        
+
         // 获取容器日志
         println!("   获取容器日志...");
         match DockerCommand::logs(test_container, Some(5)) {
@@ -139,7 +139,7 @@ fn main() -> Result<(), DockerError> {
 
     // 8. 演示镜像操作
     println!("\n8. 演示镜像操作...");
-    
+
     // 拉取一个简单的测试镜像
     let test_image = "hello-world";
     println!("   拉取测试镜像 '{}'...", test_image);
@@ -156,7 +156,9 @@ fn main() -> Result<(), DockerError> {
     // 10. 演示运行容器
     println!("\n10. 演示运行容器...");
     println!("    ℹ️  运行容器操作需要镜像，这里跳过演示");
-    println!("    使用方法: DockerCommand::run_container(\"image\", \"name\", None, None, None, true)");
+    println!(
+        "    使用方法: DockerCommand::run_container(\"image\", \"name\", None, None, None, true)"
+    );
 
     println!("\n🎉 Docker命令示例演示完成！");
     println!("\n可用的Docker命令:");

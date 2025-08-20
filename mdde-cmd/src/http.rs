@@ -21,13 +21,17 @@ impl MddeClient {
     }
 
     /// 下载指定目录的脚本
-    pub async fn download_script(&self, directory: &str, filename: &str) -> Result<String, MddeError> {
+    pub async fn download_script(
+        &self,
+        directory: &str,
+        filename: &str,
+    ) -> Result<String, MddeError> {
         let url = format!("{}/{}/{}", self.base_url, directory, filename);
         info!("下载脚本: {}", url);
         println!("下载脚本-print: {}", url);
 
         let response = self.client.get(&url).send().await?;
-        
+
         if response.status().is_success() {
             let content = response.text().await?;
             Ok(content)
@@ -42,7 +46,7 @@ impl MddeClient {
     //     info!("下载目录: {}", url);
 
     //     let response = self.client.get(&url).send().await?;
-        
+
     //     if response.status().is_success() {
     //         let content = response.bytes().await?;
     //         Ok(content.to_vec())
@@ -79,7 +83,10 @@ impl MddeClient {
     // }
 
     /// 获取脚本列表
-    pub async fn list_scripts(&self, directory: Option<&str>) -> Result<serde_json::Value, MddeError> {
+    pub async fn list_scripts(
+        &self,
+        directory: Option<&str>,
+    ) -> Result<serde_json::Value, MddeError> {
         let url = if let Some(dir) = directory {
             format!("{}/list/{}", self.base_url, dir)
         } else {
@@ -89,7 +96,7 @@ impl MddeClient {
         info!("获取脚本列表: {}", url);
 
         let response = self.client.get(&url).send().await?;
-        
+
         if response.status().is_success() {
             let content = response.json().await?;
             Ok(content)
@@ -103,7 +110,7 @@ impl MddeClient {
         let url = format!("{}/delete/{}/{}", self.base_url, directory, filename);
         info!("删除脚本: {}", url);
 
-                let response = self.client.delete(&url).send().await?;
+        let response = self.client.delete(&url).send().await?;
 
         if response.status().is_success() {
             Ok(())
@@ -115,11 +122,10 @@ impl MddeClient {
     /// 检查服务器连接
     pub async fn ping(&self) -> Result<bool, MddeError> {
         let url = format!("{}/", self.base_url);
-        
+
         match self.client.get(&url).send().await {
             Ok(response) => Ok(response.status().is_success()),
             Err(_) => Ok(false),
         }
     }
 }
- 

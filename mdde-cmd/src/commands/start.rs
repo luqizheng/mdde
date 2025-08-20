@@ -6,20 +6,26 @@ use std::process::Command;
 use tracing::info;
 
 pub async fn execute(detach: bool, _config: Config) -> Result<(), MddeError> {
-    let name =_config.container_name.clone();
+    let name = _config.container_name.clone();
 
     info!("启动开发环境: {}", name.clone().unwrap_or_default());
 
     // 检查 docker-compose.yml 文件是否存在
-    let compose_file = std::env::current_dir()?.join(".mdde").join("docker-compose.yml");
+    let compose_file = std::env::current_dir()?
+        .join(".mdde")
+        .join("docker-compose.yml");
     if !compose_file.exists() {
-        return Err(MddeError::FileOperation("docker-compose.yml 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(
+            "docker-compose.yml 文件不存在".to_string(),
+        ));
     }
 
     // 检查 .mdde.env 文件是否存在
     let env_file = std::env::current_dir()?.join(".mdde").join("cfg.env");
     if !env_file.exists() {
-        return Err(MddeError::FileOperation(".mdde/cfg.env 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(
+            ".mdde/cfg.env 文件不存在".to_string(),
+        ));
     }
 
     // 构建 docker-compose 命令

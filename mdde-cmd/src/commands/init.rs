@@ -1,8 +1,8 @@
 use crate::config::Config;
 use crate::error::MddeError;
 use crate::i18n;
-use colored::*;
 use crate::utils::DEFAULT_HOST;
+use colored::*;
 use std::collections::HashMap;
 use std::io::{self, Write};
 use tracing::info;
@@ -33,7 +33,7 @@ pub async fn execute(host: Option<String>, mut config: Config) -> Result<(), Mdd
     // 创建环境变量文件
     let mut env_vars = HashMap::new();
     env_vars.insert("host".to_string(), host.clone());
-    
+
     Config::save_env_file(&env_vars).await?;
 
     println!("{}", i18n::t("init_success").green());
@@ -51,9 +51,9 @@ fn get_host_interactively() -> Result<String, MddeError> {
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).map_err(MddeError::Io)?;
-    
+
     let host = input.trim();
-    
+
     if host.is_empty() {
         Ok(DEFAULT_HOST.to_string())
     } else {
@@ -65,15 +65,15 @@ fn get_host_interactively() -> Result<String, MddeError> {
 fn validate_url(url: &str) -> Result<(), MddeError> {
     if !url.starts_with("http://") && !url.starts_with("https://") {
         return Err(MddeError::InvalidArgument(
-            "服务器地址必须以 http:// 或 https:// 开头".to_string()
+            "服务器地址必须以 http:// 或 https:// 开头".to_string(),
         ));
     }
-    
+
     // 使用 url crate 进行更严格的验证
     match url::Url::parse(url) {
         Ok(_) => Ok(()),
         Err(_) => Err(MddeError::InvalidArgument(
-            "无效的服务器地址格式".to_string()
+            "无效的服务器地址格式".to_string(),
         )),
     }
 }

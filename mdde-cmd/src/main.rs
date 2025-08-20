@@ -9,7 +9,7 @@ use tracing::{error, info};
 async fn main() -> Result<(), MddeError> {
     // 初始化语言设置
     i18n::init_language();
-    
+
     // 初始化日志
     tracing_subscriber::fmt::init();
 
@@ -19,7 +19,10 @@ async fn main() -> Result<(), MddeError> {
     // 加载配置
     let config = Config::load().await?;
     // 打印 config 数据
-    println!("{}", i18n::tf("current_config", &[&format!("{:#?}", config)]));
+    println!(
+        "{}",
+        i18n::tf("current_config", &[&format!("{:#?}", config)])
+    );
 
     info!("MDDE 命令行工具启动");
 
