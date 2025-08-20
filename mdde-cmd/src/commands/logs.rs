@@ -14,7 +14,7 @@ pub async fn execute(
     // 从环境变量文件获取容器名称
     let env_vars = Config::load_env_file().await?;
     let container_name = env_vars.get("container_name")
-        .or_else(|| config.container_name.as_ref())
+        .or(config.container_name.as_ref())
         .ok_or_else(|| MddeError::EnvironmentNotFound(
             "未找到容器名称，请先运行 'mdde create' 创建环境或使用 'mdde env --set container_name=your_name' 设置容器名".to_string()
         ))?;

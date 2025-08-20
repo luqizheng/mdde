@@ -47,10 +47,10 @@ pub async fn execute(host: Option<String>, mut config: Config) -> Result<(), Mdd
 fn get_host_interactively() -> Result<String, MddeError> {
     println!("{}", i18n::t("enter_server_address").cyan());
     print!("{}", i18n::t("default_address"));
-    io::stdout().flush().map_err(|e| MddeError::Io(e))?;
+    io::stdout().flush().map_err(MddeError::Io)?;
 
     let mut input = String::new();
-    io::stdin().read_line(&mut input).map_err(|e| MddeError::Io(e))?;
+    io::stdin().read_line(&mut input).map_err(MddeError::Io)?;
     
     let host = input.trim();
     
