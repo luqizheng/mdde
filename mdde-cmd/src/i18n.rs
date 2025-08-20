@@ -70,7 +70,7 @@ fn detect_system_language() -> Language {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("powershell")
-            .args(&["-Command", "Get-Culture | Select-Object -ExpandProperty Name"])
+            .args(["-Command", "Get-Culture | Select-Object -ExpandProperty Name"])
             .output()
         {
             if let Ok(locale) = String::from_utf8(output.stdout) {

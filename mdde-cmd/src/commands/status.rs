@@ -55,7 +55,7 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
             // 解析状态输出并转换为 YAML
             let status_info = parse_status_output(&status_output);
             let yaml_output = serde_yaml::to_string(&status_info)
-                .map_err(|e| MddeError::Yaml(e))?;
+                .map_err(MddeError::Yaml)?;
             println!("{}", yaml_output);
         }
     }

@@ -179,10 +179,10 @@ fn get_dev_env_interactively() -> Result<String, MddeError> {
     println!("  - python311    (Python 3.11 开发环境)");
     
     print!("请输入开发环境类型: ");
-    io::stdout().flush().map_err(|e| MddeError::Io(e))?;
+    io::stdout().flush().map_err(MddeError::Io)?;
 
     let mut input = String::new();
-    io::stdin().read_line(&mut input).map_err(|e| MddeError::Io(e))?;
+    io::stdin().read_line(&mut input).map_err(MddeError::Io)?;
     
     let dev_env = input.trim();
     
@@ -211,10 +211,10 @@ fn get_dev_env_interactively() -> Result<String, MddeError> {
 fn get_name_interactively() -> Result<String, MddeError> {
     println!("{}", "请输入环境名称:".cyan());
     print!("环境名称 (用于标识容器): ");
-    io::stdout().flush().map_err(|e| MddeError::Io(e))?;
+    io::stdout().flush().map_err(MddeError::Io)?;
 
     let mut input = String::new();
-    io::stdin().read_line(&mut input).map_err(|e| MddeError::Io(e))?;
+    io::stdin().read_line(&mut input).map_err(MddeError::Io)?;
     
     let name = input.trim();
     
