@@ -72,7 +72,9 @@ jobs:
 
     - name: 运行测试
       working-directory: mdde-cmd
-      run: cargo test --verbose  RUST_BACKTRACE=1
+      env:
+        RUST_BACKTRACE: 1
+      run: cargo test --verbose
 
   # PR 构建预览
   build-preview:
