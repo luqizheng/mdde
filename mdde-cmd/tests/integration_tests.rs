@@ -3,7 +3,7 @@ use mdde::{Config, http::MddeClient, MddeError};
 #[tokio::test]
 async fn test_config_default() {
     let config = Config::default();
-    assert_eq!(config.host, "http://192.168.2.5:3000");
+    assert_eq!(config.host, "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main");
     assert!(config.container_name.is_none());
     assert!(config.app_port.is_none());
     assert!(config.workspace.is_none());
