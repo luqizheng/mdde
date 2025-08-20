@@ -22,7 +22,7 @@ impl MddeClient {
 
     /// 下载指定目录的脚本
     pub async fn download_script(&self, directory: &str, filename: &str) -> Result<String, MddeError> {
-        let url = format!("{}/get/{}/{}", self.base_url, directory, filename);
+        let url = format!("{}/{}/{}", self.base_url, directory, filename);
         info!("下载脚本: {}", url);
         println!("下载脚本-print: {}", url);
 
@@ -36,47 +36,47 @@ impl MddeClient {
         }
     }
 
-    /// 下载整个目录的脚本
-    pub async fn download_directory(&self, directory: &str) -> Result<Vec<u8>, MddeError> {
-        let url = format!("{}/get/{}", self.base_url, directory);
-        info!("下载目录: {}", url);
+    // /// 下载整个目录的脚本
+    // pub async fn download_directory(&self, directory: &str) -> Result<Vec<u8>, MddeError> {
+    //     let url = format!("{}/get/{}", self.base_url, directory);
+    //     info!("下载目录: {}", url);
 
-        let response = self.client.get(&url).send().await?;
+    //     let response = self.client.get(&url).send().await?;
         
-        if response.status().is_success() {
-            let content = response.bytes().await?;
-            Ok(content.to_vec())
-        } else {
-            Err(MddeError::HttpStatus(response.status().as_u16()))
-        }
-    }
+    //     if response.status().is_success() {
+    //         let content = response.bytes().await?;
+    //         Ok(content.to_vec())
+    //     } else {
+    //         Err(MddeError::HttpStatus(response.status().as_u16()))
+    //     }
+    // }
 
-    /// 上传脚本到指定目录
-    pub async fn upload_script(
-        &self,
-        directory: &str,
-        filename: &str,
-        content: &[u8],
-    ) -> Result<(), MddeError> {
-        let url = format!("{}/upload/{}", self.base_url, directory);
-        info!("上传脚本: {} -> {}", filename, url);
+    // /// 上传脚本到指定目录
+    // pub async fn upload_script(
+    //     &self,
+    //     directory: &str,
+    //     filename: &str,
+    //     content: &[u8],
+    // ) -> Result<(), MddeError> {
+    //     let url = format!("{}/upload/{}", self.base_url, directory);
+    //     info!("上传脚本: {} -> {}", filename, url);
 
-        let form = reqwest::multipart::Form::new()
-            .part("file", reqwest::multipart::Part::bytes(content.to_vec())
-                .file_name(filename.to_string()));
+    //     let form = reqwest::multipart::Form::new()
+    //         .part("file", reqwest::multipart::Part::bytes(content.to_vec())
+    //             .file_name(filename.to_string()));
 
-        let response = self.client
-            .post(&url)
-            .multipart(form)
-            .send()
-            .await?;
+    //     let response = self.client
+    //         .post(&url)
+    //         .multipart(form)
+    //         .send()
+    //         .await?;
 
-        if response.status().is_success() {
-            Ok(())
-        } else {
-            Err(MddeError::HttpStatus(response.status().as_u16()))
-        }
-    }
+    //     if response.status().is_success() {
+    //         Ok(())
+    //     } else {
+    //         Err(MddeError::HttpStatus(response.status().as_u16()))
+    //     }
+    // }
 
     /// 获取脚本列表
     pub async fn list_scripts(&self, directory: Option<&str>) -> Result<serde_json::Value, MddeError> {

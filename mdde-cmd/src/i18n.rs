@@ -119,7 +119,7 @@ fn get_messages() -> &'static HashMap<MessageKey, (String, String)> {
         messages.insert("server_address", ("Server address: {}".to_string(), "服务器地址: {}".to_string()));
         messages.insert("env_file_created", ("Environment file created: .mdde/cfg.env".to_string(), "环境变量文件已创建: .mdde/cfg.env".to_string()));
         messages.insert("enter_server_address", ("Please enter MDDE server address:".to_string(), "请输入 MDDE 服务器地址:".to_string()));
-        messages.insert("default_address", ("Default address [http://192.168.2.5:3000]: ".to_string(), "默认地址 [http://192.168.2.5:3000]: ".to_string()));
+        messages.insert("default_address", ("Default address [https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main]: ".to_string(), "默认地址 [https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main]: ".to_string()));
         
         // 诊断相关
         messages.insert("system_diagnosis", ("🔍 MDDE System Diagnosis".to_string(), "🔍 MDDE 系统诊断".to_string()));
