@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::error::MddeError;
 use crate::i18n;
 use colored::*;
+use crate::utils::DEFAULT_HOST;
 use std::collections::HashMap;
 use std::io::{self, Write};
 use tracing::info;
@@ -54,7 +55,7 @@ fn get_host_interactively() -> Result<String, MddeError> {
     let host = input.trim();
     
     if host.is_empty() {
-        Ok("http://192.168.2.5:3000".to_string())
+        Ok(DEFAULT_HOST.to_string())
     } else {
         Ok(host.to_string())
     }
