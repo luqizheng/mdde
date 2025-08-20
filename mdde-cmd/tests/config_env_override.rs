@@ -12,6 +12,21 @@ async fn test_config_load_with_env_override() {
     // 临时切换到测试目录
     std::env::set_current_dir(&temp_dir).unwrap();
     
+    // 强力清理 - 重试多次
+    for _ in 0..3 {
+        if Path::new(".mdde").exists() {
+            if Path::new(".mdde").is_file() {
+                let _ = fs::remove_file(".mdde");
+            } else {
+                let _ = fs::remove_dir_all(".mdde");
+            }
+        }
+        if !Path::new(".mdde").exists() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    
     // 创建 .mdde/cfg.env 文件  
     fs::create_dir_all(".mdde").unwrap();
     let env_content = "host=http://localhost:8080\n";
@@ -23,13 +38,22 @@ async fn test_config_load_with_env_override() {
     // 验证 host 被 .mdde/cfg.env 覆盖
     assert_eq!(config.host, "http://localhost:8080");
     
-    // 清理
-    fs::remove_dir_all(".mdde").unwrap();
+    // 清理 - 确保完全清理
+    if Path::new(".mdde").exists() {
+        fs::remove_dir_all(".mdde").unwrap();
+    }
     std::env::set_current_dir(current_dir).unwrap();
 }
 
 #[tokio::test]
 async fn test_config_load_without_env_file() {
+    // 创建临时目录以确保隔离
+    let temp_dir = tempdir().unwrap();
+    let current_dir = std::env::current_dir().unwrap();
+    
+    // 临时切换到测试目录
+    std::env::set_current_dir(&temp_dir).unwrap();
+    
     // 确保当前目录没有 .mdde/cfg.env 文件
     let env_path = Config::get_env_file_path().unwrap();
     if env_path.exists() {
@@ -40,7 +64,10 @@ async fn test_config_load_without_env_file() {
     let config = Config::load().await.unwrap();
     
     // 验证使用默认值
-    assert_eq!(config.host, "http://192.168.2.5:3000");
+    assert_eq!(config.host, "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main");
+    
+    // 清理
+    std::env::set_current_dir(current_dir).unwrap();
 }
 
 #[tokio::test]
@@ -50,6 +77,15 @@ async fn test_env_file_parsing() {
     
     // 临时切换到测试目录
     std::env::set_current_dir(&temp_dir).unwrap();
+    
+    // 清理可能存在的文件/目录
+    if Path::new(".mdde").exists() {
+        if Path::new(".mdde").is_file() {
+            fs::remove_file(".mdde").unwrap();
+        } else {
+            fs::remove_dir_all(".mdde").unwrap();
+        }
+    }
     
     // 创建包含注释和空行的 .mdde/cfg.env 文件
     fs::create_dir_all(".mdde").unwrap();
@@ -79,7 +115,6 @@ app_port=5000
     if Path::new(".mdde").exists() {
         fs::remove_dir_all(".mdde").unwrap();
     }
-    fs::remove_dir_all(".mdde").unwrap();
         
     std::env::set_current_dir(current_dir).unwrap();
 }
@@ -91,6 +126,15 @@ async fn test_config_save_and_load() {
     
     // 临时切换到测试目录
     std::env::set_current_dir(&temp_dir).unwrap();
+    
+    // 清理可能存在的文件/目录
+    if Path::new(".mdde").exists() {
+        if Path::new(".mdde").is_file() {
+            fs::remove_file(".mdde").unwrap();
+        } else {
+            fs::remove_dir_all(".mdde").unwrap();
+        }
+    }
     
     // 创建测试配置
     let mut test_config = Config::default();
@@ -115,6 +159,8 @@ async fn test_config_save_and_load() {
     assert_eq!(loaded_config.workspace, Some(PathBuf::from("./test-workspace")));
     
     // 清理
-    fs::remove_dir_all(".mdde").unwrap();
+    if Path::new(".mdde").exists() {
+        fs::remove_dir_all(".mdde").unwrap();
+    }
     std::env::set_current_dir(current_dir).unwrap();
 }

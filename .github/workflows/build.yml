@@ -109,7 +109,9 @@ jobs:
 
     - name: 运行测试
       working-directory: mdde-cmd
-      run: cargo test --verbose
+      env:
+        RUST_BACKTRACE: 1
+      run: cargo test --verbose -- --test-threads=1
 
     - name: 运行 Clippy
       working-directory: mdde-cmd
