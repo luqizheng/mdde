@@ -90,12 +90,34 @@ pub async fn execute(
     // 创建 HTTP 客户端
     let client = MddeClient::new(&config.host);
 
+    // 确保 .mdde 目录存在
+    let mdde_dir = workspace_path.join(".mdde");
+    tokio::fs::create_dir_all(&mdde_dir).await?;
+
     // 下载 docker-compose.yml 文件
     let compose_content = client.download_script(&dev_env, "docker-compose.yml").await?;
     
     // 保存 docker-compose.yml 文件
-    let compose_path = workspace_path.join(".mdde").join("docker-compose.yml");
+    let compose_path = mdde_dir.join("docker-compose.yml");
     tokio::fs::write(&compose_path, compose_content).await?;
+    println!("{}", "✓ 已下载 docker-compose.yml".green());
+
+    // 下载 Dockerfile 文件（如果存在）
+    match client.download_script(&dev_env, "Dockerfile").await {
+        Ok(dockerfile_content) => {
+            let dockerfile_path = mdde_dir.join("Dockerfile");
+            tokio::fs::write(&dockerfile_path, dockerfile_content).await?;
+            println!("{}", "✓ 已下载 Dockerfile".green());
+        }
+        Err(MddeError::HttpStatus(404)) => {
+            // Dockerfile 不存在，这是正常情况
+            println!("{}", "ℹ Dockerfile 不存在，使用默认镜像".yellow());
+        }
+        Err(e) => {
+            // 其他错误，记录但不中断流程
+            println!("{}", format!("⚠ 下载 Dockerfile 失败: {}", e).yellow());
+        }
+    }
 
     // 更新环境变量文件
     let mut env_vars = Config::load_env_file().await?;
@@ -123,8 +145,14 @@ pub async fn execute(
     if let Some((host_port, container_port, port_str)) = &validated_app_port {
         println!("应用端口: {} (主机端口:{} -> 容器端口:{})", port_str, host_port, container_port);
     }
-    println!("配置文件: docker-compose.yml");
+    println!("配置文件: .mdde/docker-compose.yml");
     println!("环境变量文件: .mdde/cfg.env");
+    
+    // 检查是否下载了 Dockerfile
+    let dockerfile_path = mdde_dir.join("Dockerfile");
+    if dockerfile_path.exists() {
+        println!("自定义镜像: .mdde/Dockerfile");
+    }
 
     println!("\n{}", "下一步操作:".yellow());
     println!("1. 启动环境: mdde start");
