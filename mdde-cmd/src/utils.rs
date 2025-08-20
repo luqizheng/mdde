@@ -107,3 +107,4 @@ pub fn get_arch_info() -> String {
         "unknown".to_string()
     }
 }
+pub const DEFAULT_HOST: &str = "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main";

@@ -8,6 +8,8 @@ MDDE 现在支持交互式输入模式，当您没有提供必需参数时，程
 ### 1. Init 命令交互式输入
 
 **不带参数运行：**
+
+
 ```bash
 mdde init
 ```
@@ -15,7 +17,7 @@ mdde init
 程序会提示您输入服务器地址：
 ```
 请输入 MDDE 服务器地址:
-默认地址 [http://192.168.2.5:3000]: 
+默认地址 [https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main]: 
 ```
 
 您可以：

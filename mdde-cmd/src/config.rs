@@ -1,4 +1,5 @@
 use crate::error::MddeError;
+use crate::utils::DEFAULT_HOST;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -15,7 +16,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            host: "http://192.168.2.5:3000".to_string(),
+            host: DEFAULT_HOST.to_string(),
             container_name: None,
             app_port: None,
             workspace: None,
