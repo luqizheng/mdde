@@ -11,15 +11,21 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
     info!("查看开发环境状态");
 
     // 检查 docker-compose.yml 文件是否存在
-    let compose_file = std::env::current_dir()?.join(".mdde").join("docker-compose.yml");
+    let compose_file = std::env::current_dir()?
+        .join(".mdde")
+        .join("docker-compose.yml");
     if !compose_file.exists() {
-        return Err(MddeError::FileOperation("docker-compose.yml 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(
+            "docker-compose.yml 文件不存在".to_string(),
+        ));
     }
 
     // 检查 .mdde.env 文件是否存在
     let env_file = std::env::current_dir()?.join(".mdde").join("cfg.env");
     if !env_file.exists() {
-        return Err(MddeError::FileOperation(".mdde/cfg.env 文件不存在".to_string()));
+        return Err(MddeError::FileOperation(
+            ".mdde/cfg.env 文件不存在".to_string(),
+        ));
     }
 
     // 获取 docker-compose 状态
@@ -54,8 +60,7 @@ pub async fn execute(format: OutputFormat, _config: Config) -> Result<(), MddeEr
         OutputFormat::Yaml => {
             // 解析状态输出并转换为 YAML
             let status_info = parse_status_output(&status_output);
-            let yaml_output = serde_yaml::to_string(&status_info)
-                .map_err(MddeError::Yaml)?;
+            let yaml_output = serde_yaml::to_string(&status_info).map_err(MddeError::Yaml)?;
             println!("{}", yaml_output);
         }
     }

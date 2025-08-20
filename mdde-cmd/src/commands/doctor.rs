@@ -63,7 +63,10 @@ fn check_docker() -> Result<(), MddeError> {
 }
 
 fn check_docker_compose() -> Result<(), MddeError> {
-    println!("{}", format!("\n{}", i18n::t("check_docker_compose")).cyan());
+    println!(
+        "{}",
+        format!("\n{}", i18n::t("check_docker_compose")).cyan()
+    );
 
     let output = Command::new("docker-compose").arg("--version").output();
     match output {

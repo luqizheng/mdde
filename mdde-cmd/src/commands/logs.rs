@@ -33,34 +33,53 @@ pub async fn execute(
 
     // 确定要显示的行数：位置参数优先，然后是 --tail，最后是默认值
     let display_lines = lines.or(tail);
-    
+
     if all {
         // 显示所有日志，不添加 --tail 参数
-        println!("{}", format!("显示容器 {} 的所有日志...", container_name).yellow());
+        println!(
+            "{}",
+            format!("显示容器 {} 的所有日志...", container_name).yellow()
+        );
     } else if let Some(num_lines) = display_lines {
         cmd.arg("--tail").arg(num_lines.to_string());
-        println!("{}", format!("显示容器 {} 的最后 {} 行日志...", container_name, num_lines).yellow());
+        println!(
+            "{}",
+            format!("显示容器 {} 的最后 {} 行日志...", container_name, num_lines).yellow()
+        );
     } else {
         // 默认显示最后 50 行
         cmd.arg("--tail").arg("50");
-        println!("{}", format!("显示容器 {} 的最后 50 行日志...", container_name).yellow());
+        println!(
+            "{}",
+            format!("显示容器 {} 的最后 50 行日志...", container_name).yellow()
+        );
     }
 
-    println!("执行命令: {}", format!("docker logs {}", 
-        if follow { format!("-f {}", container_name) } 
-        else if all { container_name.to_string() }
-        else { format!("--tail {} {}", display_lines.unwrap_or(50), container_name) }
-    ).cyan());
+    println!(
+        "执行命令: {}",
+        format!(
+            "docker logs {}",
+            if follow {
+                format!("-f {}", container_name)
+            } else if all {
+                container_name.to_string()
+            } else {
+                format!("--tail {} {}", display_lines.unwrap_or(50), container_name)
+            }
+        )
+        .cyan()
+    );
 
     if follow {
         // 实时跟踪日志
         println!("{}", "实时跟踪日志 (按 Ctrl+C 停止)...".green());
         let mut child = cmd.spawn()?;
         let status = child.wait()?;
-        
+
         if !status.success() {
             return Err(MddeError::Docker(format!(
-                "获取日志失败，容器 '{}' 可能不存在或未运行", container_name
+                "获取日志失败，容器 '{}' 可能不存在或未运行",
+                container_name
             )));
         }
     } else {
@@ -79,7 +98,8 @@ pub async fn execute(
             let stderr = String::from_utf8_lossy(&output.stderr);
             if stderr.contains("No such container") {
                 return Err(MddeError::ContainerNotRunning(format!(
-                    "容器 '{}' 不存在。请检查容器名称或先启动容器", container_name
+                    "容器 '{}' 不存在。请检查容器名称或先启动容器",
+                    container_name
                 )));
             } else {
                 return Err(MddeError::Docker(format!("获取日志失败: {}", stderr)));

@@ -16,11 +16,11 @@ pub async fn execute(
 
     if all {
         println!("{}", i18n::t("clean_all_resources").yellow());
-        
+
         // 清理所有未使用的资源
         let mut cmd = Command::new("docker");
         cmd.arg("system").arg("prune").arg("-a").arg("-f");
-        
+
         let output = cmd.output()?;
         if output.status.success() {
             let result = String::from_utf8_lossy(&output.stdout);
@@ -36,7 +36,7 @@ pub async fn execute(
             println!("{}", i18n::t("clean_images").yellow());
             let mut cmd = Command::new("docker");
             cmd.arg("image").arg("prune").arg("-f");
-            
+
             let output = cmd.output()?;
             if output.status.success() {
                 let result = String::from_utf8_lossy(&output.stdout);
@@ -52,7 +52,7 @@ pub async fn execute(
             println!("{}", i18n::t("clean_containers").yellow());
             let mut cmd = Command::new("docker");
             cmd.arg("container").arg("prune").arg("-f");
-            
+
             let output = cmd.output()?;
             if output.status.success() {
                 let result = String::from_utf8_lossy(&output.stdout);
@@ -68,7 +68,7 @@ pub async fn execute(
             println!("{}", i18n::t("clean_volumes").yellow());
             let mut cmd = Command::new("docker");
             cmd.arg("volume").arg("prune").arg("-f");
-            
+
             let output = cmd.output()?;
             if output.status.success() {
                 let result = String::from_utf8_lossy(&output.stdout);

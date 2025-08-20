@@ -1,6 +1,6 @@
-use std::process::Command;
 use std::error::Error;
 use std::fmt;
+use std::process::Command;
 
 /// Docker命令执行器
 pub struct DockerCommand;
@@ -44,12 +44,14 @@ impl DockerCommand {
             .arg("--version")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
-            Err(DockerError::CommandFailed("Docker版本命令执行失败".to_string()))
+            Err(DockerError::CommandFailed(
+                "Docker版本命令执行失败".to_string(),
+            ))
         }
     }
 
@@ -59,12 +61,14 @@ impl DockerCommand {
             .arg("info")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
-            Err(DockerError::CommandFailed("Docker信息命令执行失败".to_string()))
+            Err(DockerError::CommandFailed(
+                "Docker信息命令执行失败".to_string(),
+            ))
         }
     }
 
@@ -77,12 +81,14 @@ impl DockerCommand {
             .arg("table {{.Names}}\t{{.Status}}\t{{.Image}}")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
-            Err(DockerError::CommandFailed("Docker ps命令执行失败".to_string()))
+            Err(DockerError::CommandFailed(
+                "Docker ps命令执行失败".to_string(),
+            ))
         }
     }
 
@@ -94,12 +100,14 @@ impl DockerCommand {
             .arg("table {{.Names}}\t{{.Status}}\t{{.Image}}")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
-            Err(DockerError::CommandFailed("Docker ps命令执行失败".to_string()))
+            Err(DockerError::CommandFailed(
+                "Docker ps命令执行失败".to_string(),
+            ))
         }
     }
 
@@ -114,7 +122,7 @@ impl DockerCommand {
             .arg("{{.Names}}")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             let output_str = String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))?;
@@ -134,13 +142,15 @@ impl DockerCommand {
             .arg("{{.Names}}")
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             let output_str = String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))?;
             Ok(!output_str.trim().is_empty())
         } else {
-            Err(DockerError::CommandFailed("检查容器运行状态失败".to_string()))
+            Err(DockerError::CommandFailed(
+                "检查容器运行状态失败".to_string(),
+            ))
         }
     }
 
@@ -151,12 +161,15 @@ impl DockerCommand {
             .arg(name)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("容器 {} 启动成功", name))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("启动容器失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "启动容器失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -167,12 +180,15 @@ impl DockerCommand {
             .arg(name)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("容器 {} 停止成功", name))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("停止容器失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "停止容器失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -183,12 +199,15 @@ impl DockerCommand {
             .arg(name)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("容器 {} 重启成功", name))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("重启容器失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "重启容器失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -202,20 +221,23 @@ impl DockerCommand {
             .arg(command)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("执行命令失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "执行命令失败: {}",
+                error_msg
+            )))
         }
     }
 
     /// 进入容器进行交互式操作
     pub fn exec_interactive(container: &str, shell: &str) -> Result<(), DockerError> {
         use std::process::Stdio;
-        
+
         let mut cmd = Command::new("docker");
         cmd.arg("exec")
             .arg("-it")
@@ -224,15 +246,18 @@ impl DockerCommand {
             .stdin(Stdio::inherit())
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit());
-        
-        let status = cmd.status()
+
+        let status = cmd
+            .status()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if status.success() {
             Ok(())
         } else {
-            Err(DockerError::CommandFailed(format!("交互式执行失败，退出代码: {}", 
-                status.code().unwrap_or(-1))))
+            Err(DockerError::CommandFailed(format!(
+                "交互式执行失败，退出代码: {}",
+                status.code().unwrap_or(-1)
+            )))
         }
     }
 
@@ -240,22 +265,26 @@ impl DockerCommand {
     pub fn logs(container: &str, tail: Option<u32>) -> Result<String, DockerError> {
         let mut cmd = Command::new("docker");
         cmd.arg("logs");
-        
+
         if let Some(lines) = tail {
             cmd.arg("--tail").arg(lines.to_string());
         }
-        
+
         cmd.arg(container);
-        
-        let output = cmd.output()
+
+        let output = cmd
+            .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("获取容器日志失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "获取容器日志失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -266,13 +295,16 @@ impl DockerCommand {
             .arg(container)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             String::from_utf8(output.stdout)
                 .map_err(|e| DockerError::OutputParseFailed(e.to_string()))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("获取容器信息失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "获取容器信息失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -280,21 +312,25 @@ impl DockerCommand {
     pub fn rm_container(name: &str, force: bool) -> Result<String, DockerError> {
         let mut cmd = Command::new("docker");
         cmd.arg("rm");
-        
+
         if force {
             cmd.arg("-f");
         }
-        
+
         cmd.arg(name);
-        
-        let output = cmd.output()
+
+        let output = cmd
+            .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("容器 {} 删除成功", name))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("删除容器失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "删除容器失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -307,12 +343,15 @@ impl DockerCommand {
             .arg(path)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("镜像 {} 构建成功", tag))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("构建镜像失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "构建镜像失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -323,12 +362,15 @@ impl DockerCommand {
             .arg(image)
             .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("镜像 {} 拉取成功", image))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("拉取镜像失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "拉取镜像失败: {}",
+                error_msg
+            )))
         }
     }
 
@@ -343,34 +385,38 @@ impl DockerCommand {
     ) -> Result<String, DockerError> {
         let mut cmd = Command::new("docker");
         cmd.arg("run");
-        
+
         if detach {
             cmd.arg("-d");
         }
-        
+
         if let Some(port_mapping) = ports {
             cmd.arg("-p").arg(port_mapping);
         }
-        
+
         if let Some(volume_mapping) = volumes {
             cmd.arg("-v").arg(volume_mapping);
         }
-        
+
         if let Some(env_vars) = env {
             cmd.arg("-e").arg(env_vars);
         }
-        
+
         cmd.arg("--name").arg(name);
         cmd.arg(image);
-        
-        let output = cmd.output()
+
+        let output = cmd
+            .output()
             .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
-        
+
         if output.status.success() {
             Ok(format!("容器 {} 启动成功", name))
         } else {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            Err(DockerError::CommandFailed(format!("启动容器失败: {}", error_msg)))
+            Err(DockerError::CommandFailed(format!(
+                "启动容器失败: {}",
+                error_msg
+            )))
         }
     }
 }
