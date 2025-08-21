@@ -171,7 +171,7 @@ pub async fn execute(
     Ok(())
 }
 
-/// 交互式获取开发环境类型
+/// 交互式获取开发环境类型. TODO: 从服务器获取开发环境类型
 fn get_dev_env_interactively() -> Result<String, MddeError> {
     println!("{}", "请选择开发环境类型:".cyan());
     println!("可用选项:");

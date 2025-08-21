@@ -3,108 +3,52 @@
 [![Build and Release](https://github.com/luqizheng/mdde/actions/workflows/build.yml/badge.svg)](https://github.com/luqizheng/mdde/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**语言**: [English](README_EN.md) | [中文](README.md)
+
 一个基于 Rust 编写的跨平台命令行工具，用于管理 Docker 多语言开发环境。
 
 ## 🚀 功能特性
 
-- **Docker 集成**: 完整的 Docker 命令行包装器
-- **HTTP 客户端**: 支持文件上传、下载、列表等操作
-- **配置管理**: TOML 配置文件和环境变量支持
-- **错误处理**: 完善的错误类型和转换系统
-- **工具函数**: 文件系统、验证、格式化等实用功能
+- **Docker 集成**: 完整的 Docker 和 Docker Compose 管理
+- **模板系统**: 从远程服务器下载开发环境模板
+- **多格式输出**: 支持 Table、JSON、YAML 格式输出
+- **国际化支持**: 内置多语言支持系统
+- **系统诊断**: 内置环境检查和诊断功能
+- **配置管理**: 灵活的环境变量配置系统
 
 ## 🏗️ 系统架构
 
 ### 架构概述
 
-MDDE 是一个基于模板的 Docker 多语言开发环境管理工具，通过文件服务器API提供统一的模板访问和管理接口。
+MDDE 是一个基于模板的 Docker 多语言开发环境管理工具，通过 HTTP 客户端从远程服务器下载 docker-compose 模板，实现快速环境搭建。
 
 ### 工作原理
 
-1. **模板存储**: 开发环境模板存储在 [GitHub 仓库](https://github.com/luqizheng/mdde-dockerifle) 或 [Gitee 仓库](https://gitee.com/kudi_technology_in_zhuhai_2247752/mdde-docker) 中
-2. **文件服务**: 通过文件服务器API提供模板文件的下载、上传、管理功能
-3. **环境创建**: 使用 `mdde create` 命令时，系统会：
-   - 连接到配置的文件服务器
-   - 下载指定的 docker-compose.yml 模板
-   - 保存到本地 `.mdde` 目录
-   - 配置环境变量
+1. **初始化配置**: 使用 `mdde init` 设置远程模板服务器地址
+2. **创建环境**: 使用 `mdde create` 下载指定的 docker-compose 模板
+3. **环境管理**: 通过 Docker Compose 管理容器生命周期
+4. **配置存储**: 所有配置存储在 `.mdde/cfg.env` 文件中
 
-### 使用示例
-
-```bash
-# 创建 .NET 开发环境
-mdde create dotnet/sdk8.0
-
-# 系统会下载: {host}/get/dotnet/sdk8.0/docker-compose.yml
-# 保存为: .mdde/docker-compose.yml
-```
-
-### API 接口设计
-
-文件服务器需要实现以下 RESTful API 接口：
-
-| 方法 | 端点 | 功能 | 示例 |
-|------|------|------|------|
-| `GET` | `/get/{directory}/{filename}` | 下载单个文件 | `/get/dotnet/sdk8.0/docker-compose.yml` |
-| `GET` | `/get/{directory}` | 下载整个目录 | `/get/dotnet/sdk8.0` |
-| `POST` | `/upload/{directory}` | 上传文件 | `/upload/dotnet/sdk8.0` |
-| `GET` | `/list[/{directory}]` | 列出文件/目录 | `/list/dotnet` |
-| `DELETE` | `/delete/{directory}/{filename}` | 删除文件 | `/delete/dotnet/sdk8.0/docker-compose.yml` |
-| `GET` | `/` | 健康检查 | 服务状态检查 |
-
-### 模板仓库结构
-
-基于 [mdde-dockerifle](https://github.com/luqizheng/mdde-dockerifle) 仓库，模板按技术栈组织：
+### 文件结构
 
 ```
-mdde-dockerifle/
-├── dotnet/                    # .NET 开发环境
-│   ├── sdk6.0/
-│   ├── sdk8.0/
-│   └── sdk9.0/
-├── java/                      # Java 开发环境
-│   ├── openjdk11/
-│   ├── openjdk17/
-│   └── openjdk21/
-├── nodejs/                    # Node.js 开发环境
-│   ├── node18/
-│   ├── node20/
-│   └── node22/
-└── python/                    # Python 开发环境
-    ├── python311/
-    └── yolo-11/
+项目目录/
+├── .mdde/
+│   ├── cfg.env              # 环境变量配置
+│   └── docker-compose.yml   # Docker Compose 配置
+├── .gitignore              # 自动更新忽略 .mdde/ 目录
+└── 其他项目文件...
 ```
 
-每个模板目录包含：
-- `docker-compose.yml` - Docker Compose 配置文件
-- `Dockerfile` (可选) - 自定义镜像构建文件
-- `README.md` (可选) - 模板说明文档
+### 模板服务器
 
-### 部署模式
+默认模板服务器：`https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main`
 
-#### 开发模式
-```bash
-# 使用本地文件服务器
-DEFAULT_HOST = "http://192.168.2.5:3000"
-```
-
-#### 生产模式
-```bash
-# 使用云端文件服务器
-DEFAULT_HOST = "https://api.your-domain.com"
-```
-
-#### GitHub Raw 模式（只读）
-```bash
-# 直接从 GitHub 获取文件（有限功能）
-DEFAULT_HOST = "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main"
-```
-
-### 配置管理
-
-- **DEFAULT_HOST**: 在 `src/utils.rs` 中定义默认文件服务器地址
-- **运行时配置**: 通过 `.mdde/cfg.env` 文件覆盖默认配置
-- **环境变量**: 支持通过环境变量动态配置服务器地址
+支持的开发环境类型：
+- **dotnet**: .NET 开发环境（sdk6.0, sdk8.0, sdk9.0等）
+- **java**: Java 开发环境（openjdk11, openjdk17, openjdk21等）
+- **nodejs**: Node.js 开发环境（node18, node20, node22等）
+- **python**: Python 开发环境（python311, yolo-11等）
 
 ## 🛠️ 安装和运行
 
@@ -147,13 +91,14 @@ DEFAULT_HOST = "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs
 #### 前置要求
 - Rust 1.70+
 - Docker (已安装并添加到 PATH)
+- Docker Compose (已安装并添加到 PATH)
 
 #### 构建步骤
 
 1. **克隆项目**
    ```bash
    git clone https://github.com/luqizheng/mdde.git
-   cd mdde-cmd
+   cd mdde/mdde-cmd
    ```
 
 2. **构建项目**
@@ -166,84 +111,161 @@ DEFAULT_HOST = "https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs
    cargo install --path .
    ```
 
-4. **运行示例**
-   ```bash
-   # Docker 命令示例
-   cargo run --example docker_usage
-   
-   # 基本使用示例
-   cargo run --example basic_usage
-   ```
-
 ## ⚙️ 配置管理
 
-### 配置管理
-- **`.mdde.env` 文件** (当前工作目录)
-- **默认配置** (如果环境变量文件不存在)
+### 配置文件
 
-### 配置文件位置
+MDDE 使用 `.mdde/cfg.env` 文件存储配置信息：
 
-#### Windows
-- 环境变量文件: `当前工作目录\.mdde.env`
-
-#### Linux/macOS
-- 环境变量文件: `当前工作目录\.mdde.env`
-
-### 环境变量文件 (.mdde.env)
 ```bash
-# 复制示例文件
-cp .mdde.env.example .mdde.env
-
-# 编辑配置
-host=http://your-server:3000
+host=https://raw.githubusercontent.com/luqizheng/mdde-dockerifle/refs/heads/main
 container_name=my-project
-debug_port=5000
-workspace=./my-workspace
+app_port=8080
+workspace=/path/to/workspace
 ```
 
-**重要**: `.mdde.env` 文件是唯一的配置文件，适合项目特定的配置。
+### 配置项说明
 
-### 环境变量文件格式 (.mdde.env)
-```bash
-host=http://192.168.2.5:3000
-container_name=my-container
-debug_port=5000
-workspace=./my-workspace
-```
+- **host**: 模板服务器地址
+- **container_name**: 容器名称
+- **app_port**: 应用端口号
+- **workspace**: 工作目录路径
+
+### 自动配置
+
+- 创建 `.mdde/cfg.env` 文件时，MDDE 会自动更新 `.gitignore` 文件
+- 忽略整个 `.mdde/` 目录，避免配置文件被提交到版本控制
 
 ## 🔌 使用方法
 
-### 基本命令
+### 基本工作流程
+
 ```bash
-# 初始化配置
-mdde init http://localhost:3000
+# 1. 初始化配置
+mdde init
 
-# 创建开发环境
-mdde create dotnet9 --name my-project
+# 2. 创建开发环境
+mdde create dotnet/sdk8.0 --name my-dotnet-app --app_port 8080:80
 
-# 启动环境
-mdde start my-project
+# 3. 启动环境
+mdde start
 
-# 查看状态
+# 4. 查看状态
 mdde status
 
-# 查看日志
-mdde logs my-project
+# 5. 进入容器
+mdde exec
 
-# 停止环境
-mdde stop my-project
+# 6. 停止环境
+mdde stop
 ```
 
-### Docker 操作
+### 命令详解
+
+#### 初始化
 ```bash
-# 检查 Docker 状态
-mdde docker check
+cd 源码
+# 交互式初始化
+mdde init
 
-# 列出容器
-mdde docker ps
+# 指定服务器地址
+mdde init --host https://your-server.com
+```
 
-# 执行命令
-mdde docker exec my-container "ls -la"
+#### 创建环境
+```bash
+# 交互式创建
+mdde create
+
+# 指定参数创建，源码和执行mdde的目录不同。 用 --workspace 指定源码位置。
+mdde create java/openjdk17 --name my-java-app --app_port 8080:8080 --workspace ./src
+# 或者
+mdde create java/openjdk17
+```
+
+#### 环境管理
+```bash
+# 启动环境（前台）
+mdde start
+
+# 启动环境（后台）
+mdde start --detach
+
+# 停止环境
+mdde stop
+
+# 停止并删除容器
+mdde stop --remove
+
+# 重启环境
+mdde restart
+```
+
+#### 容器操作
+```bash
+# 进入容器（默认 bash）
+mdde exec
+
+# 指定shell
+mdde exec /bin/sh
+
+# 在容器中执行命令
+mdde run ls -la
+mdde run npm install
+```
+
+#### 状态和日志
+```bash
+# 查看状态（表格格式）
+mdde status
+
+# JSON 格式输出
+mdde status --format json
+
+# YAML 格式输出
+mdde status --format yaml
+
+# 查看日志
+mdde logs
+
+# 查看最后50行日志
+mdde logs 50
+
+# 实时跟踪日志
+mdde logs --follow
+```
+
+#### 清理操作
+```bash
+# 清理所有未使用资源
+mdde clean --all
+
+# 只清理镜像
+mdde clean --images
+
+# 只清理容器
+mdde clean --containers
+
+# 只清理数据卷
+mdde clean --volumes
+```
+
+#### 系统诊断
+```bash
+# 检查系统环境
+mdde doctor
+```
+
+#### 环境变量管理
+```bash
+# 查看所有环境变量
+mdde env --ls
+
+# 设置环境变量
+mdde env --set "host=https://new-server.com"
+
+# 删除环境变量
+mdde env --del container_name
 ```
 
 ## 🧪 测试
@@ -264,47 +286,80 @@ cargo test --test integration_tests
 ```
 mdde-cmd/
 ├── src/
-│   ├── main.rs          # 主程序入口
-│   ├── lib.rs           # 库入口
-│   ├── error.rs         # 错误定义
-│   ├── config.rs        # 配置管理 (.mdde.env)
-│   ├── http.rs          # HTTP 客户端
-│   ├── docker.rs        # Docker 命令包装器
-│   ├── cli.rs           # CLI 定义
-│   ├── commands/        # 命令实现
-│   └── utils.rs         # 工具函数
-├── examples/             # 示例程序
-├── tests/               # 集成测试
-├── .mdde.env.example    # 环境变量文件示例
-├── Cargo.toml           # 项目配置
-└── README.md            # 项目文档
+│   ├── main.rs              # 主程序入口
+│   ├── lib.rs               # 库入口
+│   ├── cli.rs               # CLI 定义和命令路由
+│   ├── config.rs            # 配置管理（.mdde/cfg.env）
+│   ├── error.rs             # 错误类型定义
+│   ├── http.rs              # HTTP 客户端实现
+│   ├── docker.rs            # Docker 命令包装器
+│   ├── i18n.rs              # 国际化支持
+│   ├── utils.rs             # 工具函数
+│   └── commands/            # 命令实现
+│       ├── mod.rs
+│       ├── init.rs          # 初始化命令
+│       ├── create.rs        # 创建环境命令
+│       ├── start.rs         # 启动命令
+│       ├── stop.rs          # 停止命令
+│       ├── status.rs        # 状态查看命令
+│       ├── logs.rs          # 日志查看命令
+│       ├── exec.rs          # 进入容器命令
+│       ├── run.rs           # 执行命令
+│       ├── clean.rs         # 清理命令
+│       ├── doctor.rs        # 系统诊断命令
+│       ├── env.rs           # 环境变量管理命令
+│       ├── version.rs       # 版本信息命令
+│       └── restart.rs       # 重启命令
+├── examples/                # 示例程序
+├── tests/                   # 集成测试
+├── Cargo.toml               # 项目配置
+└── README.md                # 项目文档
 ```
 
-## 🔒 安全特性
+## 🔒 技术栈
 
-- **路径遍历防护**: 防止访问系统目录外的文件
-- **文件类型验证**: 确保操作的是正确的文件类型
-- **错误处理**: 完善的错误处理和状态码返回
+- **语言**: Rust 2021 Edition
+- **CLI框架**: clap 4.4 (derive feature)
+- **异步运行时**: tokio 1.35 (full features)
+- **HTTP客户端**: reqwest 0.11 (json, multipart features)
+- **序列化**: serde, serde_json, serde_yaml, toml
+- **错误处理**: thiserror, anyhow
+- **日志**: tracing, tracing-subscriber
+- **其他**: colored, indicatif, dirs, walkdir
 
 ## 🚨 注意事项
 
-1. **Docker 依赖**: 需要系统已安装 Docker 并添加到 PATH
+### 系统要求
+1. **Docker**: 必须安装 Docker 并确保在 PATH 中可用
+2. **Docker Compose**: 必须安装 Docker Compose
+3. **网络连接**: 需要能够访问模板服务器
+
+### 使用注意
+1. **配置文件**: `.mdde/cfg.env` 包含敏感配置，已自动加入 `.gitignore`
 2. **权限要求**: 某些 Docker 操作可能需要管理员权限
-3. **网络配置**: HTTP 客户端需要网络连接
-4. **配置优先级**: `.mdde.env` 文件会覆盖其他配置
+3. **端口冲突**: 创建环境时注意避免端口冲突
+
+### 故障排除
+```bash
+# 使用诊断命令检查环境
+mdde doctor
+
+# 检查 Docker 状态
+docker --version
+docker-compose --version
+docker info
+```
 
 ## 🚀 CI/CD 流程
 
 本项目使用 GitHub Actions 进行自动化构建和发布：
 
 ### 自动构建
-
 - **触发条件**: 推送到 `main`、`develop` 分支或创建 Pull Request
 - **构建平台**: Linux x64、Windows x64、macOS Intel、macOS Apple Silicon
 - **构建产物**: 自动上传到 GitHub Actions Artifacts
 
 ### 自动发布
-
 - **触发条件**: 推送 `v*` 格式的 Git 标签（如 `v1.0.0`）
 - **发布内容**: 
   - 跨平台二进制文件
@@ -312,7 +367,6 @@ mdde-cmd/
   - 自动生成发布说明
 
 ### 创建新版本
-
 1. **更新版本号**
    ```bash
    # 更新 mdde-cmd/Cargo.toml 中的版本号
@@ -332,8 +386,20 @@ mdde-cmd/
    - 创建新的 Release 页面
    - 上传二进制文件和压缩包
 
-### 开发工作流
+## 🤝 贡献
 
+欢迎提交 Issue 和 Pull Request！
+
+### 贡献指南
+
+1. **报告问题**: 使用 [Issue 模板](https://github.com/luqizheng/mdde/issues/new) 报告 bug 或请求新功能
+2. **代码贡献**: 
+   - Fork 项目并创建功能分支
+   - 确保代码通过所有测试和检查
+   - 提交 Pull Request 等待审核
+3. **文档改进**: 欢迎改进文档和示例代码
+
+### 开发工作流
 ```bash
 # 1. Fork 并克隆项目
 git clone https://github.com/your-username/mdde.git
@@ -355,35 +421,6 @@ git push origin feature/your-feature
 # 5. 创建 Pull Request
 ```
 
-### 本地构建
-
-如果需要本地构建当前平台的版本：
-
-```bash
-# 进入项目目录
-cd mdde-cmd
-
-# 构建发布版本
-cargo build --release
-
-# 安装到系统
-cargo install --path .
-```
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-### 贡献指南
-
-1. **报告问题**: 使用 [Issue 模板](https://github.com/luqizheng/mdde/issues/new) 报告 bug 或请求新功能
-2. **代码贡献**: 
-   - Fork 项目并创建功能分支
-   - 确保代码通过所有测试和检查
-   - 提交 Pull Request 等待审核
-3. **文档改进**: 欢迎改进文档和示例代码
-
 ## 📄 许可证
 
 MIT License
-
