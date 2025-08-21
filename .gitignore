@@ -2,7 +2,8 @@
 /mdde-cmd/target/
 **/*.rs.bk
 Cargo.lock
-
+/release-builds
+/packages
 # IDE 文件
 .vscode/
 .idea/
