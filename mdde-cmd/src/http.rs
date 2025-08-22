@@ -1,5 +1,5 @@
-use crate::error::MddeError;
 use crate::commands::create::DevEnvironment;
+use crate::error::MddeError;
 use reqwest::Client;
 use tracing::info;
 
@@ -136,7 +136,8 @@ impl MddeClient {
         info!("获取开发环境列表: {}", url);
         println!("获取开发环境列表-print: {}", url);
 
-        let response = self.client
+        let response = self
+            .client
             .get(&url)
             .header("Accept", "application/json")
             .header("User-Agent", "mdde-cmd/1.0")
@@ -150,7 +151,7 @@ impl MddeClient {
             // 先获取文本内容进行调试
             let text = response.text().await?;
             println!("响应内容: {}", text);
-            
+
             // 尝试解析 JSON
             match serde_json::from_str::<Vec<DevEnvironment>>(&text) {
                 Ok(environments) => {

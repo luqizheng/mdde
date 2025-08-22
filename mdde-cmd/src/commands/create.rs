@@ -184,7 +184,7 @@ pub async fn execute(
 /// 交互式获取开发环境类型，从服务器动态获取环境列表
 async fn get_dev_env_interactively(config: &Config) -> Result<String, MddeError> {
     println!("{}", "请选择开发环境类型:".cyan());
-    
+
     // 尝试从服务器获取环境列表
     let client = MddeClient::new(&config.host);
     let environments = match client.get_environments().await {
