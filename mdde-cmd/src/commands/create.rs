@@ -2,10 +2,20 @@ use crate::config::Config;
 use crate::error::MddeError;
 use crate::http::MddeClient;
 use colored::*;
+use serde::Deserialize;
 use std::collections::HashMap;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use tracing::info;
+
+/// 开发环境信息
+#[derive(Debug, Deserialize, Clone)]
+pub struct DevEnvironment {
+    /// 环境名称，如 "node/v22"
+    pub name: String,
+    /// 环境描述，如 "Node.js 22 开发环境"
+    pub description: String,
+}
 
 /// 验证应用端口格式是否为 number:number
 fn validate_app_port(port_mapping: &str) -> Result<(u16, u16), MddeError> {
@@ -50,12 +60,12 @@ pub async fn execute(
     let dev_env = match dev_env {
         Some(env) => {
             if env.trim().is_empty() {
-                get_dev_env_interactively()?
+                get_dev_env_interactively(&config).await?
             } else {
                 env
             }
         }
-        None => get_dev_env_interactively()?,
+        None => get_dev_env_interactively(&config).await?,
     };
 
     // 获取环境名称，如果没有提供则交互式询问
@@ -171,21 +181,32 @@ pub async fn execute(
     Ok(())
 }
 
-/// 交互式获取开发环境类型. TODO: 从服务器获取开发环境类型
-fn get_dev_env_interactively() -> Result<String, MddeError> {
+/// 交互式获取开发环境类型，从服务器动态获取环境列表
+async fn get_dev_env_interactively(config: &Config) -> Result<String, MddeError> {
     println!("{}", "请选择开发环境类型:".cyan());
+    
+    // 尝试从服务器获取环境列表
+    let client = MddeClient::new(&config.host);
+    let environments = match client.get_environments().await {
+        Ok(envs) => {
+            println!("{}", "✓ 从服务器获取环境列表".green());
+            envs
+        }
+        Err(e) => {
+            println!("{}", format!("⚠ 无法从服务器获取环境列表: {}", e).yellow());
+            println!("{}", "使用默认环境列表".yellow());
+            get_default_environments()
+        }
+    };
+
+    if environments.is_empty() {
+        return Err(MddeError::InvalidInput("没有可用的开发环境".to_string()));
+    }
+
     println!("可用选项:");
-    println!("  - dotnet9      (.NET 9 开发环境)");
-    println!("  - dotnet8      (.NET 8 开发环境)");
-    println!("  - dotnet6      (.NET 6 开发环境)");
-    println!("  - java21       (Java 21 开发环境)");
-    println!("  - java18       (Java 18 开发环境)");
-    println!("  - java11       (Java 11 开发环境)");
-    println!("  - node22       (Node.js 22 开发环境)");
-    println!("  - node20       (Node.js 20 开发环境)");
-    println!("  - node18       (Node.js 18 开发环境)");
-    println!("  - python312    (Python 3.12 开发环境)");
-    println!("  - python311    (Python 3.11 开发环境)");
+    for env in &environments {
+        println!("  - {}    ({})", env.name.cyan(), env.description);
+    }
 
     print!("请输入开发环境类型: ");
     io::stdout().flush().map_err(MddeError::Io)?;
@@ -200,21 +221,9 @@ fn get_dev_env_interactively() -> Result<String, MddeError> {
     }
 
     // 验证输入的环境类型是否有效
-    let valid_envs = [
-        "dotnet9",
-        "dotnet8",
-        "dotnet6",
-        "java21",
-        "java18",
-        "java11",
-        "node22",
-        "node20",
-        "node18",
-        "python312",
-        "python311",
-    ];
+    let valid_env_names: Vec<&str> = environments.iter().map(|e| e.name.as_str()).collect();
 
-    if !valid_envs.contains(&dev_env) {
+    if !valid_env_names.contains(&dev_env) {
         return Err(MddeError::InvalidInput(format!(
             "无效的开发环境类型: '{}'. 请选择有效的环境类型",
             dev_env
@@ -222,6 +231,56 @@ fn get_dev_env_interactively() -> Result<String, MddeError> {
     }
 
     Ok(dev_env.to_string())
+}
+
+/// 获取默认的开发环境列表（作为回退选项）
+fn get_default_environments() -> Vec<DevEnvironment> {
+    vec![
+        DevEnvironment {
+            name: "dotnet9".to_string(),
+            description: ".NET 9 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "dotnet8".to_string(),
+            description: ".NET 8 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "dotnet6".to_string(),
+            description: ".NET 6 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "java21".to_string(),
+            description: "Java 21 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "java18".to_string(),
+            description: "Java 18 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "java11".to_string(),
+            description: "Java 11 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "node22".to_string(),
+            description: "Node.js 22 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "node20".to_string(),
+            description: "Node.js 20 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "node18".to_string(),
+            description: "Node.js 18 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "python312".to_string(),
+            description: "Python 3.12 开发环境".to_string(),
+        },
+        DevEnvironment {
+            name: "python311".to_string(),
+            description: "Python 3.11 开发环境".to_string(),
+        },
+    ]
 }
 
 /// 交互式获取环境名称

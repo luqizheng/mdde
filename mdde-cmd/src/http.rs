@@ -1,4 +1,5 @@
 use crate::error::MddeError;
+use crate::commands::create::DevEnvironment;
 use reqwest::Client;
 use tracing::info;
 
@@ -126,6 +127,45 @@ impl MddeClient {
         match self.client.get(&url).send().await {
             Ok(response) => Ok(response.status().is_success()),
             Err(_) => Ok(false),
+        }
+    }
+
+    /// 获取可用的开发环境列表
+    pub async fn get_environments(&self) -> Result<Vec<DevEnvironment>, MddeError> {
+        let url = format!("{}/index.json", self.base_url);
+        info!("获取开发环境列表: {}", url);
+        println!("获取开发环境列表-print: {}", url);
+
+        let response = self.client
+            .get(&url)
+            .header("Accept", "application/json")
+            .header("User-Agent", "mdde-cmd/1.0")
+            .send()
+            .await?;
+
+        println!("响应状态: {}", response.status());
+        println!("响应头: {:?}", response.headers());
+
+        if response.status().is_success() {
+            // 先获取文本内容进行调试
+            let text = response.text().await?;
+            println!("响应内容: {}", text);
+            
+            // 尝试解析 JSON
+            match serde_json::from_str::<Vec<DevEnvironment>>(&text) {
+                Ok(environments) => {
+                    println!("成功解析环境列表，共 {} 个环境", environments.len());
+                    Ok(environments)
+                }
+                Err(e) => {
+                    println!("JSON 解析失败: {}", e);
+                    println!("原始响应内容: '{}'", text);
+                    Err(MddeError::HttpStatus(400)) // 返回解析错误
+                }
+            }
+        } else {
+            println!("HTTP 请求失败，状态码: {}", response.status());
+            Err(MddeError::HttpStatus(response.status().as_u16()))
         }
     }
 }
