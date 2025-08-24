@@ -39,8 +39,10 @@ fi
 
 # 运行构建测试
 echo -e "${YELLOW}🏗️ 开始 CentOS 7 兼容构建...${NC}"
+echo "注意: CentOS 7 已 EOL，使用 vault.centos.org 镜像源"
 if ! docker run --name "${TEST_CONTAINER}" -v "${PROJECT_DIR}:/workspace" "${BUILD_IMAGE}"; then
     echo -e "${RED}❌ 构建过程失败${NC}"
+    echo "查看构建日志:"
     docker logs "${TEST_CONTAINER}" 2>/dev/null || true
     exit 1
 fi

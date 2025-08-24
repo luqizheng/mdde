@@ -1,8 +1,13 @@
 # CentOS 7 构建环境 - 用于创建兼容老系统的 MDDE 二进制文件
 FROM centos:7
 
+# 修复 CentOS 7 EOL 源问题（切换到 vault 镜像源）
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo
+
 # 更新包管理器和安装基础工具
-RUN yum update -y && \
+RUN yum clean all && \
+    yum update -y && \
     yum groupinstall -y "Development Tools" && \
     yum install -y \
         openssl-devel \

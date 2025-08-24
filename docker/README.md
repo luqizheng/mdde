@@ -10,6 +10,8 @@
 
 CentOS 7 使用较老的 OpenSSL 1.0.x 版本，而现代构建的 Rust 程序通常依赖 OpenSSL 3.x。为了确保 MDDE 能在 CentOS 7 系统上正常运行，我们提供了专门的构建环境。
 
+**⚠️ 重要说明**: CentOS 7 于 2024年6月30日 结束生命周期 (EOL)。我们的构建环境已配置使用 `vault.centos.org` 镜像源来解决原官方源不可用的问题。
+
 ### 文件说明
 
 - `centos7.Dockerfile` - CentOS 7 构建环境 Docker 镜像
@@ -83,9 +85,17 @@ CentOS 7 构建使用了以下 Cargo features：
 
 #### 构建失败
 
+**CentOS 7 源问题**:
+如果遇到 `Could not resolve host: mirrorlist.centos.org` 错误，我们的构建脚本会自动修复源配置。
+
 ```bash
 # 检查 Docker 容器环境
 docker run --rm -it centos:7 bash
+
+# 手动修复源（如果需要）
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo
+sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo
+yum clean all
 
 # 手动验证依赖
 yum list installed | grep openssl-devel

@@ -176,6 +176,15 @@ export OPENSSL_STATIC=0
 
 ## ⚠️ 注意事项
 
+### CentOS 7 EOL 问题
+
+**重要**: CentOS 7 于 2024年6月30日 结束生命周期 (EOL)，官方镜像源 `mirrorlist.centos.org` 已不可用。
+
+我们的解决方案：
+- ✅ 自动切换到 `vault.centos.org` 存档源
+- ✅ 在 Dockerfile 和构建脚本中预先修复
+- ✅ GitHub Actions 自动处理源配置
+
 ### 系统要求
 
 - **CentOS 7 / RHEL 7**: 使用 `mdde-linux-x64-centos7`

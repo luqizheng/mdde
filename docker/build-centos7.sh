@@ -31,6 +31,11 @@ cd mdde-cmd
 echo -e "${YELLOW}🎯 安装 Rust 构建目标...${NC}"
 rustup target add x86_64-unknown-linux-gnu
 
+# 修复 CentOS 7 EOL 源问题
+echo -e "${YELLOW}🔧 修复 CentOS 7 源配置...${NC}"
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo
+sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo
+
 # 验证依赖库
 echo -e "${YELLOW}📦 验证系统依赖库...${NC}"
 if ! pkg-config --exists openssl; then
