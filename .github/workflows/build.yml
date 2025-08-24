@@ -71,12 +71,14 @@ jobs:
 
     - name: 安装 Linux 依赖
       if: matrix.os == 'ubuntu-latest' && !matrix.use-centos7-docker
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y pkg-config libssl-dev
 
     - name: 使用 CentOS 7 Docker 构建
       if: matrix.use-centos7-docker
+      shell: bash
       run: |
         # 创建 CentOS 7 构建脚本
         cat > centos7-build.sh << 'EOF'
@@ -111,15 +113,16 @@ jobs:
           centos:7 \
           bash centos7-build.sh
 
-    - name: 构建项目
-      if: "!matrix.use-centos7-docker"
+    - name: 构建项目 (标准)
+      if: matrix.use-centos7-docker != true && (matrix.build-features == '' || matrix.build-features == null)
       working-directory: mdde-cmd
-      run: |
-        if [ -n "${{ matrix.build-features }}" ]; then
-          cargo build --release --target ${{ matrix.target }} --features ${{ matrix.build-features }}
-        else
-          cargo build --release --target ${{ matrix.target }}
-        fi
+      run: cargo build --release --target ${{ matrix.target }}
+
+    - name: 构建项目 (带 features)
+      if: matrix.use-centos7-docker != true && matrix.build-features != '' && matrix.build-features != null
+      working-directory: mdde-cmd
+      run: cargo build --release --target ${{ matrix.target }} --features ${{ matrix.build-features }}
+        
 
     - name: 准备发布文件
       shell: bash
@@ -156,6 +159,7 @@ jobs:
         workspaces: "mdde-cmd -> target"
 
     - name: 安装依赖
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y pkg-config libssl-dev
@@ -191,6 +195,7 @@ jobs:
         path: artifacts
 
     - name: 准备发布文件
+      shell: bash  
       run: |
         mkdir -p release-assets
         
@@ -214,6 +219,7 @@ jobs:
         chmod +x release-assets/mdde-linux-x64-centos7
 
     - name: 创建压缩包
+      shell: bash
       run: |
         cd release-assets
         
@@ -234,6 +240,7 @@ jobs:
 
     - name: 获取版本信息
       id: get_version
+      shell: bash
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
     - name: 创建 Release
