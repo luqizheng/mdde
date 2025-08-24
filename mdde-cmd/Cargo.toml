@@ -1,6 +1,6 @@
 [package]
 name = "mdde"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 authors = ["luqizheng <luqizheng@hotmail,com>"]
 description = "一个基于 Rust 编写的跨平台命令行工具，用于管理 Docker 多语言开发环境"

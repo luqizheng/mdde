@@ -150,7 +150,7 @@ impl MddeClient {
         if response.status().is_success() {
             // 先获取文本内容进行调试
             let text = response.text().await?;
-            println!("响应内容: {}", text);
+            //println!("响应内容: {}", text);
 
             // 尝试解析 JSON
             match serde_json::from_str::<Vec<DevEnvironment>>(&text) {

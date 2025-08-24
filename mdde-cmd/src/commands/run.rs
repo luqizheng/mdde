@@ -27,12 +27,9 @@ pub async fn execute(command: Vec<String>, config: Config) -> Result<(), MddeErr
         return Err(MddeError::ContainerNotRunning(container_name));
     }
 
-    // 执行命令
-    match DockerCommand::exec_command(&container_name, &command_str) {
-        Ok(output) => {
-            if !output.trim().is_empty() {
-                println!("{}", output);
-            }
+    // 执行命令，实时输出
+    match DockerCommand::exec_command_stream(&container_name, &command_str) {
+        Ok(()) => {
             println!("{}", "✓ 命令执行成功".green());
         }
         Err(e) => {

@@ -234,6 +234,33 @@ impl DockerCommand {
         }
     }
 
+    /// 在容器中执行命令，实时输出结果
+    pub fn exec_command_stream(container: &str, command: &str) -> Result<(), DockerError> {
+        use std::process::Stdio;
+
+        let mut cmd = Command::new("docker");
+        cmd.arg("exec")
+            .arg(container)
+            .arg("sh")
+            .arg("-c")
+            .arg(command)
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+
+        let status = cmd
+            .status()
+            .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(DockerError::CommandFailed(format!(
+                "执行命令失败，退出代码: {}",
+                status.code().unwrap_or(-1)
+            )))
+        }
+    }
+
     /// 进入容器进行交互式操作
     pub fn exec_interactive(container: &str, shell: &str) -> Result<(), DockerError> {
         use std::process::Stdio;
@@ -416,6 +443,62 @@ impl DockerCommand {
             Err(DockerError::CommandFailed(format!(
                 "启动容器失败: {}",
                 error_msg
+            )))
+        }
+    }
+
+    /// 启动开发环境，实时输出结果
+    pub fn start_environment_stream(detach: bool) -> Result<(), DockerError> {
+        use std::process::Stdio;
+
+        // 检查 docker-compose.yml 文件是否存在
+        let compose_file = std::env::current_dir()
+            .map_err(|e| DockerError::CommandFailed(e.to_string()))?
+            .join(".mdde")
+            .join("docker-compose.yml");
+        if !compose_file.exists() {
+            return Err(DockerError::CommandFailed(
+                "docker-compose.yml 文件不存在".to_string(),
+            ));
+        }
+
+        // 检查 .mdde/cfg.env 文件是否存在
+        let env_file = std::env::current_dir()
+            .map_err(|e| DockerError::CommandFailed(e.to_string()))?
+            .join(".mdde")
+            .join("cfg.env");
+        if !env_file.exists() {
+            return Err(DockerError::CommandFailed(
+                ".mdde/cfg.env 文件不存在".to_string(),
+            ));
+        }
+
+        // 构建 docker-compose 命令
+        let mut cmd = Command::new("docker-compose");
+        cmd.arg("--env-file")
+            .arg(".mdde/cfg.env")
+            .arg("--file")
+            .arg(".mdde/docker-compose.yml");
+
+        if detach {
+            cmd.arg("up").arg("-d");
+        } else {
+            cmd.arg("up");
+        }
+
+        // 设置实时输出
+        cmd.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+
+        let status = cmd
+            .status()
+            .map_err(|e| DockerError::CommandFailed(e.to_string()))?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(DockerError::CommandFailed(format!(
+                "启动环境失败，退出代码: {}",
+                status.code().unwrap_or(-1)
             )))
         }
     }
