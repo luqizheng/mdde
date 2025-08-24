@@ -57,6 +57,7 @@ Supported development environment types:
 1. **Go to [Releases page](https://github.com/luqizheng/mdde/releases/latest) and download the binary for your platform**
 
    - **Linux (x64)**: `mdde-linux-x64` or `mdde-linux-x64.tar.gz`
+   - **Linux (CentOS 7 Compatible)**: `mdde-linux-x64-centos7` or `mdde-linux-x64-centos7.tar.gz`
    - **Windows (x64)**: `mdde-windows-x64.exe` or `mdde-windows-x64.zip`
    - **macOS (Intel)**: `mdde-macos-x64` or `mdde-macos-x64.tar.gz`
    - **macOS (Apple Silicon)**: `mdde-macos-arm64` or `mdde-macos-arm64.tar.gz`
@@ -333,6 +334,19 @@ mdde-cmd/
 1. **Docker**: Must have Docker installed and available in PATH
 2. **Docker Compose**: Must have Docker Compose installed
 3. **Network Connection**: Need access to template server
+
+### System Compatibility Notes
+
+**Linux Distribution Support:**
+- **Modern Distributions**: Use `mdde-linux-x64` (Ubuntu 18.04+, CentOS 8+, Rocky Linux 8+, etc.)
+- **CentOS 7 / RHEL 7**: Use the dedicated `mdde-linux-x64-centos7` compatible version
+- **Other Legacy Systems**: Recommend using CentOS 7 compatible version or building from source
+
+**OpenSSL Version Compatibility:**
+- `mdde-linux-x64`: Requires OpenSSL 3.0+ (modern systems)
+- `mdde-linux-x64-centos7`: Compatible with OpenSSL 1.0.x (CentOS 7 systems)
+
+If you encounter `libssl.so.3: cannot open shared object file` error, please download the CentOS 7 compatible version.
 
 ### Usage Notes
 1. **Configuration File**: `.mdde/cfg.env` contains sensitive configuration, automatically added to `.gitignore`

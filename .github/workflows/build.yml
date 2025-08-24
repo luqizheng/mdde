@@ -45,6 +45,14 @@ jobs:
             os: macos-latest
             binary-name: mdde
             asset-name: mdde-macos-arm64
+            
+          # CentOS 7 兼容版本 (OpenSSL 1.0)
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            binary-name: mdde
+            asset-name: mdde-linux-x64-centos7
+            use-centos7-docker: true
+            build-features: "centos7-compat"
 
     steps:
     - name: 检出代码
@@ -62,15 +70,56 @@ jobs:
         key: ${{ matrix.target }}
 
     - name: 安装 Linux 依赖
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest' && !matrix.use-centos7-docker
       run: |
         sudo apt-get update
         sudo apt-get install -y pkg-config libssl-dev
 
+    - name: 使用 CentOS 7 Docker 构建
+      if: matrix.use-centos7-docker
+      run: |
+        # 创建 CentOS 7 构建脚本
+        cat > centos7-build.sh << 'EOF'
+        #!/bin/bash
+        set -e
+        
+        # 安装必要的软件包
+        yum update -y
+        yum groupinstall -y "Development Tools"
+        yum install -y openssl-devel pkg-config curl file
+        
+        # 安装 Rust
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source ~/.cargo/env
+        rustup target add ${{ matrix.target }}
+        
+        # 设置环境变量以使用系统 OpenSSL
+        export PKG_CONFIG_ALLOW_CROSS=1
+        export OPENSSL_DIR=/usr
+        export OPENSSL_LIB_DIR=/usr/lib64
+        export OPENSSL_INCLUDE_DIR=/usr/include
+        
+        # 构建项目
+        cd /workspace/mdde-cmd
+        cargo build --release --target ${{ matrix.target }} --features ${{ matrix.build-features }}
+        EOF
+        
+        # 使用 CentOS 7 Docker 容器构建
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          centos:7 \
+          bash centos7-build.sh
+
     - name: 构建项目
+      if: "!matrix.use-centos7-docker"
       working-directory: mdde-cmd
       run: |
-        cargo build --release --target ${{ matrix.target }}
+        if [ -n "${{ matrix.build-features }}" ]; then
+          cargo build --release --target ${{ matrix.target }} --features ${{ matrix.build-features }}
+        else
+          cargo build --release --target ${{ matrix.target }}
+        fi
 
     - name: 准备发布文件
       shell: bash
@@ -159,6 +208,10 @@ jobs:
         # macOS Apple Silicon
         cp artifacts/mdde-macos-arm64/mdde release-assets/mdde-macos-arm64
         chmod +x release-assets/mdde-macos-arm64
+        
+        # CentOS 7 兼容版本
+        cp artifacts/mdde-linux-x64-centos7/mdde release-assets/mdde-linux-x64-centos7
+        chmod +x release-assets/mdde-linux-x64-centos7
 
     - name: 创建压缩包
       run: |
@@ -175,6 +228,9 @@ jobs:
         
         # macOS Apple Silicon
         tar -czf mdde-macos-arm64.tar.gz mdde-macos-arm64
+        
+        # CentOS 7 兼容版本
+        tar -czf mdde-linux-x64-centos7.tar.gz mdde-linux-x64-centos7
 
     - name: 获取版本信息
       id: get_version
@@ -192,10 +248,12 @@ jobs:
           release-assets/mdde-windows-x64.zip
           release-assets/mdde-macos-x64.tar.gz
           release-assets/mdde-macos-arm64.tar.gz
+          release-assets/mdde-linux-x64-centos7.tar.gz
           release-assets/mdde-linux-x64
           release-assets/mdde-windows-x64.exe
           release-assets/mdde-macos-x64
           release-assets/mdde-macos-arm64
+          release-assets/mdde-linux-x64-centos7
         body: |
           ## 🚀 MDDE ${{ steps.get_version.outputs.VERSION }} 发布
 
@@ -216,6 +274,11 @@ jobs:
           **macOS (Apple Silicon)**
           - 二进制文件: [mdde-macos-arm64](https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.VERSION }}/mdde-macos-arm64)
           - 压缩包: [mdde-macos-arm64.tar.gz](https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.VERSION }}/mdde-macos-arm64.tar.gz)
+          
+          **Linux (CentOS 7 兼容版本)**
+          - 二进制文件: [mdde-linux-x64-centos7](https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.VERSION }}/mdde-linux-x64-centos7)
+          - 压缩包: [mdde-linux-x64-centos7.tar.gz](https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.VERSION }}/mdde-linux-x64-centos7.tar.gz)
+          - 说明: 专为 CentOS 7 / RHEL 7 系统优化，使用 OpenSSL 1.0 兼容
 
           ### 🛠️ 安装说明
           

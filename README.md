@@ -57,6 +57,7 @@ MDDE 是一个基于模板的 Docker 多语言开发环境管理工具，通过 
 1. **前往 [Releases 页面](https://github.com/luqizheng/mdde/releases/latest) 下载对应平台的二进制文件**
 
    - **Linux (x64)**: `mdde-linux-x64` 或 `mdde-linux-x64.tar.gz`
+   - **Linux (CentOS 7 兼容)**: `mdde-linux-x64-centos7` 或 `mdde-linux-x64-centos7.tar.gz`
    - **Windows (x64)**: `mdde-windows-x64.exe` 或 `mdde-windows-x64.zip`
    - **macOS (Intel)**: `mdde-macos-x64` 或 `mdde-macos-x64.tar.gz`
    - **macOS (Apple Silicon)**: `mdde-macos-arm64` 或 `mdde-macos-arm64.tar.gz`
@@ -333,6 +334,19 @@ mdde-cmd/
 1. **Docker**: 必须安装 Docker 并确保在 PATH 中可用
 2. **Docker Compose**: 必须安装 Docker Compose
 3. **网络连接**: 需要能够访问模板服务器
+
+### 系统兼容性说明
+
+**Linux 发行版支持:**
+- **现代发行版**: 使用 `mdde-linux-x64` (Ubuntu 18.04+, CentOS 8+, Rocky Linux 8+, 等)
+- **CentOS 7 / RHEL 7**: 专门使用 `mdde-linux-x64-centos7` 兼容版本
+- **其他老旧系统**: 建议使用 CentOS 7 兼容版本或从源码编译
+
+**OpenSSL 版本兼容性:**
+- `mdde-linux-x64`: 需要 OpenSSL 3.0+ (现代系统)
+- `mdde-linux-x64-centos7`: 兼容 OpenSSL 1.0.x (CentOS 7 系统)
+
+如遇到 `libssl.so.3: cannot open shared object file` 错误，请下载 CentOS 7 兼容版本。
 
 ### 使用注意
 1. **配置文件**: `.mdde/cfg.env` 包含敏感配置，已自动加入 `.gitignore`
