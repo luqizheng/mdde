@@ -65,7 +65,7 @@ fn get_host_interactively() -> Result<String, MddeError> {
 fn validate_url(url: &str) -> Result<(), MddeError> {
     if !url.starts_with("http://") && !url.starts_with("https://") {
         return Err(MddeError::InvalidArgument(
-            "服务器地址必须以 http:// 或 https:// 开头".to_string(),
+            i18n::t("url_must_start_with").to_string(),
         ));
     }
 
@@ -73,7 +73,7 @@ fn validate_url(url: &str) -> Result<(), MddeError> {
     match url::Url::parse(url) {
         Ok(_) => Ok(()),
         Err(_) => Err(MddeError::InvalidArgument(
-            "无效的服务器地址格式".to_string(),
+            i18n::t("invalid_url_format").to_string(),
         )),
     }
 }

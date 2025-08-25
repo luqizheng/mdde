@@ -8,7 +8,7 @@ use tracing::info;
 pub async fn execute(detach: bool, _config: Config) -> Result<(), MddeError> {
     let name = _config.container_name.clone();
 
-    info!("启动开发环境: {}", name.clone().unwrap_or_default());
+    info!("{}", i18n::tf("start_env_name", &[&name.clone().unwrap_or_default()]));
 
     println!("{}", i18n::t("starting_environment").yellow());
 
@@ -23,7 +23,7 @@ pub async fn execute(detach: bool, _config: Config) -> Result<(), MddeError> {
             }
         }
         Err(e) => {
-            return Err(MddeError::Docker(format!("启动失败: {}", e)));
+            return Err(MddeError::Docker(i18n::tf("start_failed", &[&e])));
         }
     }
 

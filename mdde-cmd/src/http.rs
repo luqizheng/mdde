@@ -133,8 +133,8 @@ impl MddeClient {
     /// 获取可用的开发环境列表
     pub async fn get_environments(&self) -> Result<Vec<DevEnvironment>, MddeError> {
         let url = format!("{}/index.json", self.base_url);
-        info!("获取开发环境列表: {}", url);
         println!("获取开发环境列表-print: {}", url);
+        info!("获取开发环境列表: {}", url);
 
         let response = self
             .client
@@ -143,9 +143,6 @@ impl MddeClient {
             .header("User-Agent", "mdde-cmd/1.0")
             .send()
             .await?;
-
-        println!("响应状态: {}", response.status());
-        println!("响应头: {:?}", response.headers());
 
         if response.status().is_success() {
             // 先获取文本内容进行调试

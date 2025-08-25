@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use std::process::Command;
 use tracing::info;
@@ -16,10 +17,10 @@ pub async fn execute(
     let container_name = env_vars.get("container_name")
         .or(config.container_name.as_ref())
         .ok_or_else(|| MddeError::EnvironmentNotFound(
-            "未找到容器名称，请先运行 'mdde create' 创建环境或使用 'mdde env --set container_name=your_name' 设置容器名".to_string()
+            i18n::t("container_name_not_found").to_string()
         ))?;
 
-    info!("查看容器日志: {}", container_name);
+    info!("{}", i18n::tf("view_container_logs", &[&container_name]));
 
     // 构建 docker logs 命令
     let mut cmd = Command::new("docker");
@@ -38,26 +39,26 @@ pub async fn execute(
         // 显示所有日志，不添加 --tail 参数
         println!(
             "{}",
-            format!("显示容器 {} 的所有日志...", container_name).yellow()
+            i18n::tf("show_all_logs", &[&container_name]).yellow()
         );
     } else if let Some(num_lines) = display_lines {
         cmd.arg("--tail").arg(num_lines.to_string());
         println!(
             "{}",
-            format!("显示容器 {} 的最后 {} 行日志...", container_name, num_lines).yellow()
+            i18n::tf("show_last_n_logs", &[&num_lines, &container_name]).yellow()
         );
     } else {
         // 默认显示最后 50 行
         cmd.arg("--tail").arg("50");
         println!(
             "{}",
-            format!("显示容器 {} 的最后 50 行日志...", container_name).yellow()
+            i18n::tf("show_last_50_logs", &[&container_name]).yellow()
         );
     }
 
     println!(
-        "执行命令: {}",
-        format!(
+        "{}",
+        i18n::tf("execute_command_label", &[&format!(
             "docker logs {}",
             if follow {
                 format!("-f {}", container_name)
@@ -66,21 +67,19 @@ pub async fn execute(
             } else {
                 format!("--tail {} {}", display_lines.unwrap_or(50), container_name)
             }
-        )
-        .cyan()
+        ).cyan()])
     );
 
     if follow {
         // 实时跟踪日志
-        println!("{}", "实时跟踪日志 (按 Ctrl+C 停止)...".green());
+        println!("{}", i18n::t("follow_logs_realtime").green());
         let mut child = cmd.spawn()?;
         let status = child.wait()?;
 
         if !status.success() {
-            return Err(MddeError::Docker(format!(
-                "获取日志失败，容器 '{}' 可能不存在或未运行",
-                container_name
-            )));
+            return Err(MddeError::Docker(
+                i18n::tf("get_logs_failed", &[&container_name])
+            ));
         }
     } else {
         // 一次性查看日志
@@ -89,20 +88,19 @@ pub async fn execute(
         if output.status.success() {
             let logs_output = String::from_utf8_lossy(&output.stdout);
             if logs_output.trim().is_empty() {
-                println!("{}", "暂无日志输出".yellow());
-                println!("提示: 容器可能未运行或没有产生日志输出");
+                println!("{}", i18n::t("no_log_output").yellow());
+                println!("{}", i18n::t("container_not_running_hint"));
             } else {
                 println!("{}", logs_output);
             }
         } else {
             let stderr = String::from_utf8_lossy(&output.stderr);
             if stderr.contains("No such container") {
-                return Err(MddeError::ContainerNotRunning(format!(
-                    "容器 '{}' 不存在。请检查容器名称或先启动容器",
-                    container_name
-                )));
+                return Err(MddeError::ContainerNotRunning(
+                    i18n::tf("container_not_exists", &[&container_name])
+                ));
             } else {
-                return Err(MddeError::Docker(format!("获取日志失败: {}", stderr)));
+                return Err(MddeError::Docker(i18n::tf("get_logs_error", &[&stderr])));
             }
         }
     }

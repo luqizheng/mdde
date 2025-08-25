@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::docker::DockerCommand;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use tracing::info;
 
@@ -11,16 +12,16 @@ pub async fn execute(shell: String, config: Config) -> Result<(), MddeError> {
         .unwrap_or("default".to_string());
 
     info!(
-        "进入容器 {} 进行交互式操作，使用 shell: {}",
-        container_name, shell
+        "{}", 
+        i18n::tf("enter_container_interactive", &[&container_name, &shell])
     );
 
     println!(
         "{}",
-        format!("正在进入容器 {} 进行交互式操作...", container_name).blue()
+        i18n::tf("entering_container", &[&container_name]).blue()
     );
-    println!("{}", format!("使用 shell: {}", shell).cyan());
-    println!("{}", "提示：输入 'exit' 或按 Ctrl+D 退出容器".yellow());
+    println!("{}", i18n::tf("using_shell", &[&shell]).cyan());
+    println!("{}", i18n::t("exit_hint").yellow());
 
     // 检查容器是否正在运行
     if !DockerCommand::container_running(&container_name)? {
@@ -30,10 +31,10 @@ pub async fn execute(shell: String, config: Config) -> Result<(), MddeError> {
     // 进入容器进行交互式操作
     match DockerCommand::exec_interactive(&container_name, &shell) {
         Ok(_) => {
-            println!("{}", "✓ 已退出容器".green());
+            println!("{}", i18n::t("exited_container").green());
         }
         Err(e) => {
-            println!("{}", format!("✗ 进入容器失败: {}", e).red());
+            println!("{}", i18n::tf("enter_container_failed", &[&e]).red());
             return Err(MddeError::Docker(e.to_string()));
         }
     }

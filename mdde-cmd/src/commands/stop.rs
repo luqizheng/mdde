@@ -11,7 +11,7 @@ pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
         .clone()
         .unwrap_or("default".to_string());
 
-    info!("停止开发环境: {}", name.clone());
+    info!("{}", i18n::tf("stop_env_name", &[&name]));
 
     // 检查 docker-compose.yml 文件是否存在
     let compose_file = std::env::current_dir()?
@@ -19,7 +19,7 @@ pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
         .join("docker-compose.yml");
     if !compose_file.exists() {
         return Err(MddeError::FileOperation(
-            "docker-compose.yml 文件不存在".to_string(),
+            i18n::t("docker_compose_not_exists").to_string(),
         ));
     }
 
@@ -27,7 +27,7 @@ pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
     let env_file = std::env::current_dir()?.join(".mdde").join("cfg.env");
     if !env_file.exists() {
         return Err(MddeError::FileOperation(
-            ".mdde/cfg.env 文件不存在".to_string(),
+            i18n::t("mdde_cfg_env_not_exists").to_string(),
         ));
     }
 
@@ -55,7 +55,7 @@ pub async fn execute(remove: bool, _config: Config) -> Result<(), MddeError> {
         }
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(MddeError::Docker(format!("停止失败: {}", stderr)));
+        return Err(MddeError::Docker(i18n::tf("stop_failed", &[&stderr])));
     }
 
     Ok(())

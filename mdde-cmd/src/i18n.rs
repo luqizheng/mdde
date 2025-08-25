@@ -179,6 +179,121 @@ fn get_messages() -> &'static HashMap<MessageKey, (String, String)> {
         messages.insert("license", ("License: {}".to_string(), "许可证: {}".to_string()));
         messages.insert("repository", ("Repository: {}".to_string(), "仓库: {}".to_string()));
 
+        // 创建环境相关
+        messages.insert("select_env_type", ("Please select development environment type:".to_string(), "请选择开发环境类型:".to_string()));
+        messages.insert("env_list_from_server", ("✓ Environment list retrieved from server".to_string(), "✓ 从服务器获取环境列表".to_string()));
+        messages.insert("env_list_failed", ("⚠ Failed to retrieve environment list from server: {}".to_string(), "⚠ 无法从服务器获取环境列表: {}".to_string()));
+        messages.insert("using_default_env_list", ("Using default environment list".to_string(), "使用默认环境列表".to_string()));
+        messages.insert("no_available_envs", ("No available development environments".to_string(), "没有可用的开发环境".to_string()));
+        messages.insert("available_options", ("Available options:".to_string(), "可用选项:".to_string()));
+        messages.insert("enter_env_type", ("Please enter development environment type: ".to_string(), "请输入开发环境类型: ".to_string()));
+        messages.insert("env_type_empty", ("Development environment type cannot be empty".to_string(), "开发环境类型不能为空".to_string()));
+        messages.insert("invalid_env_type", ("Invalid development environment type: '{}'. Please select a valid environment type".to_string(), "无效的开发环境类型: '{}'. 请选择有效的环境类型".to_string()));
+        
+        messages.insert("downloaded_compose", ("✓ Downloaded docker-compose.yml".to_string(), "✓ 已下载 docker-compose.yml".to_string()));
+        messages.insert("downloaded_dockerfile", ("✓ Downloaded Dockerfile".to_string(), "✓ 已下载 Dockerfile".to_string()));
+        messages.insert("dockerfile_not_exists", ("ℹ Dockerfile does not exist, using default image".to_string(), "ℹ Dockerfile 不存在，使用默认镜像".to_string()));
+        messages.insert("dockerfile_download_failed", ("⚠ Failed to download Dockerfile: {}".to_string(), "⚠ 下载 Dockerfile 失败: {}".to_string()));
+        
+        messages.insert("env_created_success", ("✓ Development environment created successfully".to_string(), "✓ 开发环境创建成功".to_string()));
+        messages.insert("env_name_label", ("Environment name: {}".to_string(), "环境名称: {}".to_string()));
+        messages.insert("env_type_label", ("Environment type: {}".to_string(), "环境类型: {}".to_string()));
+        messages.insert("workspace_label", ("Workspace: {}".to_string(), "工作目录: {}".to_string()));
+        messages.insert("app_port_label", ("Application port: {} (host port:{} -> container port:{})".to_string(), "应用端口: {} (主机端口:{} -> 容器端口:{})".to_string()));
+        messages.insert("config_file_label", ("Configuration file: .mdde/docker-compose.yml".to_string(), "配置文件: .mdde/docker-compose.yml".to_string()));
+        messages.insert("env_file_label", ("Environment file: .mdde/cfg.env".to_string(), "环境变量文件: .mdde/cfg.env".to_string()));
+        messages.insert("custom_image_label", ("Custom image: .mdde/Dockerfile".to_string(), "自定义镜像: .mdde/Dockerfile".to_string()));
+        
+        messages.insert("next_steps", ("Next steps:".to_string(), "下一步操作:".to_string()));
+        messages.insert("start_env_step", ("1. Start environment: mdde start".to_string(), "1. 启动环境: mdde start".to_string()));
+        messages.insert("check_status_step", ("2. Check status: mdde status".to_string(), "2. 查看状态: mdde status".to_string()));
+        messages.insert("view_logs_step", ("3. View logs: mdde logs".to_string(), "3. 查看日志: mdde logs".to_string()));
+        
+        messages.insert("enter_env_name", ("Please enter environment name:".to_string(), "请输入环境名称:".to_string()));
+        messages.insert("env_name_prompt", ("Environment name (for container identification): ".to_string(), "环境名称 (用于标识容器): ".to_string()));
+        messages.insert("env_name_empty", ("Environment name cannot be empty".to_string(), "环境名称不能为空".to_string()));
+        messages.insert("env_name_invalid_chars", ("Environment name can only contain letters, numbers, hyphens and underscores".to_string(), "环境名称只能包含字母、数字、连字符和下划线".to_string()));
+        
+        // 端口验证相关
+        messages.insert("port_format_error", ("Application port format error: '{}'. Should be host_port:container_port format, example: 8080:80".to_string(), "应用端口格式错误: '{}'. 应为 host_port:container_port 格式，例如: 8080:80".to_string()));
+        messages.insert("invalid_host_port", ("Invalid host port: '{}'. Must be a number between 1-65535".to_string(), "无效的主机端口: '{}'. 必须是 1-65535 之间的数字".to_string()));
+        messages.insert("invalid_container_port", ("Invalid container port: '{}'. Must be a number between 1-65535".to_string(), "无效的容器端口: '{}'. 必须是 1-65535 之间的数字".to_string()));
+        messages.insert("port_cannot_be_zero", ("Port number cannot be 0".to_string(), "端口号不能为 0".to_string()));
+        
+        // 默认环境描述
+        messages.insert("dotnet9_desc", (".NET 9 Development Environment".to_string(), ".NET 9 开发环境".to_string()));
+        messages.insert("dotnet8_desc", (".NET 8 Development Environment".to_string(), ".NET 8 开发环境".to_string()));
+        messages.insert("dotnet6_desc", (".NET 6 Development Environment".to_string(), ".NET 6 开发环境".to_string()));
+        messages.insert("java21_desc", ("Java 21 Development Environment".to_string(), "Java 21 开发环境".to_string()));
+        messages.insert("java18_desc", ("Java 18 Development Environment".to_string(), "Java 18 开发环境".to_string()));
+        messages.insert("java11_desc", ("Java 11 Development Environment".to_string(), "Java 11 开发环境".to_string()));
+        messages.insert("node22_desc", ("Node.js 22 Development Environment".to_string(), "Node.js 22 开发环境".to_string()));
+        messages.insert("node20_desc", ("Node.js 20 Development Environment".to_string(), "Node.js 20 开发环境".to_string()));
+        messages.insert("node18_desc", ("Node.js 18 Development Environment".to_string(), "Node.js 18 开发环境".to_string()));
+        messages.insert("python312_desc", ("Python 3.12 Development Environment".to_string(), "Python 3.12 开发环境".to_string()));
+        messages.insert("python311_desc", ("Python 3.11 Development Environment".to_string(), "Python 3.11 开发环境".to_string()));
+
+        // 环境变量管理相关 (env 命令)
+        messages.insert("specify_operation", ("Please specify at least one operation: --set, --ls, or --del".to_string(), "请指定至少一个操作: --set, --ls, 或 --del".to_string()));
+        messages.insert("only_one_operation", ("Only one operation option can be used at a time".to_string(), "只能同时使用一个操作选项".to_string()));
+        messages.insert("display_env_vars", ("Display environment variable configuration".to_string(), "显示环境变量配置".to_string()));
+        messages.insert("env_file_empty", ("Environment variable file is empty or does not exist".to_string(), "环境变量文件为空或不存在".to_string()));
+        messages.insert("file_location", ("File location: .mdde/cfg.env".to_string(), "文件位置: .mdde/cfg.env".to_string()));
+        messages.insert("env_config_header", ("Environment variable configuration (.mdde/cfg.env):".to_string(), "环境变量配置 (.mdde/cfg.env):".to_string()));
+        messages.insert("total_env_vars", ("Total {} environment variables".to_string(), "总共 {} 个环境变量".to_string()));
+        messages.insert("set_env_var", ("Set environment variable".to_string(), "设置环境变量".to_string()));
+        messages.insert("env_var_updated", ("✓ Environment variable updated".to_string(), "✓ 环境变量已更新".to_string()));
+        messages.insert("env_var_added", ("✓ Environment variable added".to_string(), "✓ 环境变量已添加".to_string()));
+        messages.insert("delete_env_var", ("Delete environment variable".to_string(), "删除环境变量".to_string()));
+        messages.insert("env_var_not_exists", ("Environment variable '{}' does not exist".to_string(), "环境变量 '{}' 不存在".to_string()));
+        messages.insert("env_var_deleted", ("✓ Environment variable deleted".to_string(), "✓ 环境变量已删除".to_string()));
+        messages.insert("deleted_label", ("Deleted: {}={}".to_string(), "已删除: {}={}".to_string()));
+        messages.insert("invalid_format", ("Invalid format: '{}'. Should be key=value format, example: host=http://localhost:3000".to_string(), "无效的格式: '{}'. 应为 key=value 格式，例如: host=http://localhost:3000".to_string()));
+        messages.insert("env_var_name_empty", ("Environment variable name cannot be empty".to_string(), "环境变量名不能为空".to_string()));
+        messages.insert("env_var_name_chars", ("Environment variable name can only contain letters, numbers and underscores".to_string(), "环境变量名只能包含字母、数字和下划线".to_string()));
+
+        // 交互式执行相关 (exec 命令)
+        messages.insert("enter_container_interactive", ("Enter container {} for interactive operation, using shell: {}".to_string(), "进入容器 {} 进行交互式操作，使用 shell: {}".to_string()));
+        messages.insert("entering_container", ("Entering container {} for interactive operation...".to_string(), "正在进入容器 {} 进行交互式操作...".to_string()));
+        messages.insert("using_shell", ("Using shell: {}".to_string(), "使用 shell: {}".to_string()));
+        messages.insert("exit_hint", ("Hint: Enter 'exit' or press Ctrl+D to exit container".to_string(), "提示：输入 'exit' 或按 Ctrl+D 退出容器".to_string()));
+        messages.insert("exited_container", ("✓ Exited container".to_string(), "✓ 已退出容器".to_string()));
+        messages.insert("enter_container_failed", ("✗ Failed to enter container: {}".to_string(), "✗ 进入容器失败: {}".to_string()));
+
+        // 初始化相关 (init 命令)
+        messages.insert("url_must_start_with", ("Server address must start with http:// or https://".to_string(), "服务器地址必须以 http:// 或 https:// 开头".to_string()));
+        messages.insert("invalid_url_format", ("Invalid server address format".to_string(), "无效的服务器地址格式".to_string()));
+
+        // 日志查看相关 (logs 命令)
+        messages.insert("container_name_not_found", ("Container name not found, please run 'mdde create' to create environment first or use 'mdde env --set container_name=your_name' to set container name".to_string(), "未找到容器名称，请先运行 'mdde create' 创建环境或使用 'mdde env --set container_name=your_name' 设置容器名".to_string()));
+        messages.insert("view_container_logs", ("View container logs: {}".to_string(), "查看容器日志: {}".to_string()));
+        messages.insert("show_all_logs", ("Showing all logs for container {}...".to_string(), "显示容器 {} 的所有日志...".to_string()));
+        messages.insert("show_last_n_logs", ("Showing last {} lines of logs for container {}...".to_string(), "显示容器 {} 的最后 {} 行日志...".to_string()));
+        messages.insert("show_last_50_logs", ("Showing last 50 lines of logs for container {}...".to_string(), "显示容器 {} 的最后 50 行日志...".to_string()));
+        messages.insert("execute_command_label", ("Execute command: {}".to_string(), "执行命令: {}".to_string()));
+        messages.insert("follow_logs_realtime", ("Following logs in real-time (press Ctrl+C to stop)...".to_string(), "实时跟踪日志 (按 Ctrl+C 停止)...".to_string()));
+        messages.insert("get_logs_failed", ("Failed to get logs, container '{}' may not exist or not running".to_string(), "获取日志失败，容器 '{}' 可能不存在或未运行".to_string()));
+        messages.insert("no_log_output", ("No log output".to_string(), "暂无日志输出".to_string()));
+        messages.insert("container_not_running_hint", ("Hint: Container may not be running or has no log output".to_string(), "提示: 容器可能未运行或没有产生日志输出".to_string()));
+        messages.insert("container_not_exists", ("Container '{}' does not exist. Please check container name or start container first".to_string(), "容器 '{}' 不存在。请检查容器名称或先启动容器".to_string()));
+        messages.insert("get_logs_error", ("Failed to get logs: {}".to_string(), "获取日志失败: {}".to_string()));
+
+        // 运行命令相关 (run 命令)
+        messages.insert("provide_command", ("Please provide a command to execute".to_string(), "请提供要执行的命令".to_string()));
+        messages.insert("execute_command_in_container", ("Execute command in container {}: {}".to_string(), "在容器 {} 中执行命令: {}".to_string()));
+        messages.insert("command_success", ("✓ Command executed successfully".to_string(), "✓ 命令执行成功".to_string()));
+        messages.insert("command_failed", ("✗ Command execution failed: {}".to_string(), "✗ 命令执行失败: {}".to_string()));
+
+        // 启动环境相关 (start 命令额外的)
+        messages.insert("start_env_name", ("Start development environment: {}".to_string(), "启动开发环境: {}".to_string()));
+        messages.insert("start_failed", ("Start failed: {}".to_string(), "启动失败: {}".to_string()));
+
+        // 停止环境相关 (stop 命令)
+        messages.insert("stop_env_name", ("Stop development environment: {}".to_string(), "停止开发环境: {}".to_string()));
+        messages.insert("docker_compose_not_exists", ("docker-compose.yml file does not exist".to_string(), "docker-compose.yml 文件不存在".to_string()));
+        messages.insert("mdde_cfg_env_not_exists", (".mdde/cfg.env file does not exist".to_string(), ".mdde/cfg.env 文件不存在".to_string()));
+        messages.insert("stop_failed", ("Stop failed: {}".to_string(), "停止失败: {}".to_string()));
+
         messages
     })
 }

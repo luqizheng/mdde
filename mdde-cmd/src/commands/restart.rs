@@ -10,7 +10,7 @@ pub async fn execute(config: Config) -> Result<(), MddeError> {
         .clone()
         .unwrap_or("default".to_string());
 
-    info!("重启开发环境: {}", name.clone());
+    info!("{}", i18n::tf("restarting_environment", &[&name]));
 
     println!("{}", i18n::t("restarting_environment").yellow());
 

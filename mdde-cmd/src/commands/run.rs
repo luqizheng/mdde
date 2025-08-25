@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::docker::DockerCommand;
 use crate::error::MddeError;
+use crate::i18n;
 use colored::*;
 use tracing::info;
 
@@ -11,15 +12,15 @@ pub async fn execute(command: Vec<String>, config: Config) -> Result<(), MddeErr
         .unwrap_or("default".to_string());
 
     if command.is_empty() {
-        return Err(MddeError::InvalidInput("请提供要执行的命令".to_string()));
+        return Err(MddeError::InvalidInput(i18n::t("provide_command").to_string()));
     }
 
     let command_str = command.join(" ");
-    info!("在容器 {} 中执行命令: {}", container_name, command_str);
+    info!("{}", i18n::tf("execute_command_in_container", &[&container_name, &command_str]));
 
     println!(
         "{}",
-        format!("在容器 {} 中执行命令: {}", container_name, command_str).blue()
+        i18n::tf("execute_command_in_container", &[&container_name, &command_str]).blue()
     );
 
     // 检查容器是否正在运行
@@ -30,10 +31,10 @@ pub async fn execute(command: Vec<String>, config: Config) -> Result<(), MddeErr
     // 执行命令，实时输出
     match DockerCommand::exec_command_stream(&container_name, &command_str) {
         Ok(()) => {
-            println!("{}", "✓ 命令执行成功".green());
+            println!("{}", i18n::t("command_success").green());
         }
         Err(e) => {
-            println!("{}", format!("✗ 命令执行失败: {}", e).red());
+            println!("{}", i18n::tf("command_failed", &[&e]).red());
             return Err(MddeError::Docker(e.to_string()));
         }
     }
